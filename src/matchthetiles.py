@@ -71,18 +71,34 @@ def draw_screen(board):
 def arrow_movement(board, previouskey):
     keys_pressed = pygame.key.get_pressed()
     if keys_pressed[pygame.K_UP] and previouskey!='up':
-        print('up')
+        #print('up')
         return (movement_handler(board, -1, 0),'up')
     elif keys_pressed[pygame.K_DOWN] and previouskey!='down':
-        print('down')
+        #print('down')
         return (movement_handler(board, 1, 0),'down')
     elif keys_pressed[pygame.K_LEFT] and previouskey!='left':
-        print('left')
+        #print('left')
         return (movement_handler(board, 0, -1),'left')
     elif keys_pressed[pygame.K_RIGHT] and previouskey!='right':
-        print('right')
+        #print('right')
         return (movement_handler(board, 0, 1),'right')
     else: return (board,previouskey)
+
+
+#Operators
+
+def move_up(board):
+    return movement_handler(board, -1, 0)
+
+def move_down(board):
+    return movement_handler(board, 1, 0)
+
+def move_left(board):
+    return movement_handler(board, 0, -1)
+
+def move_right(board):
+    return movement_handler(board, 0, 1)
+
 
 
 # Board generation according to the key pressed/movement factor
@@ -131,6 +147,8 @@ def check_game_over(board, npieces):
     return npieces==0
     
 
+"""
+
 def main():
     clock = pygame.time.Clock()
     running = True
@@ -156,3 +174,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+"""
