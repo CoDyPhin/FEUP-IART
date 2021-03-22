@@ -38,7 +38,8 @@ class Board:
         colfactor = 0
         rowsize = len(self.board)
         colsize = len(self.board[0])
-
+        something_moved = False
+        self.pieces.sort(key=lambda a: a.y)
         for piece in self.pieces:
             counter = 1
             
@@ -46,9 +47,11 @@ class Board:
                 self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = 'empty'
                 self.board[(piece.y + rowfactor * counter)][piece.x + colfactor * counter][1] = piece.content
                 counter+=1
+                something_moved = True
 
             piece.x += (counter - 1)*colfactor
             piece.y += (counter - 1)*rowfactor
+        return something_moved
 
 
     def move_down(self):
@@ -56,7 +59,8 @@ class Board:
         colfactor = 0
         rowsize = len(self.board)
         colsize = len(self.board[0])
-
+        something_moved = False
+        self.pieces.sort(reverse=True, key=lambda a: a.y)
         for piece in self.pieces:
             counter = 1
             
@@ -64,9 +68,11 @@ class Board:
                 self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = 'empty'
                 self.board[(piece.y + rowfactor * counter)][piece.x + colfactor * counter][1] = piece.content
                 counter+=1
+                something_moved = True
 
             piece.x += (counter - 1)*colfactor
             piece.y += (counter - 1)*rowfactor
+        return something_moved
 
 
     def move_left(self):
@@ -74,7 +80,8 @@ class Board:
         colfactor = -1
         rowsize = len(self.board)
         colsize = len(self.board[0])
-
+        something_moved = False
+        self.pieces.sort(key=lambda a: a.x)
         for piece in self.pieces:
             counter = 1
             
@@ -82,9 +89,11 @@ class Board:
                 self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = 'empty'
                 self.board[(piece.y + rowfactor * counter)][piece.x + colfactor * counter][1] = piece.content
                 counter+=1
+                something_moved = True
 
             piece.x += (counter - 1)*colfactor
             piece.y += (counter - 1)*rowfactor
+        return something_moved
 
 
     def move_right(self):
@@ -92,7 +101,8 @@ class Board:
         colfactor = 1
         rowsize = len(self.board)
         colsize = len(self.board[0])
-
+        something_moved = False
+        self.pieces.sort(reverse=True, key=lambda a: a.x)
         for piece in self.pieces:
             counter = 1
             
@@ -100,6 +110,8 @@ class Board:
                 self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = 'empty'
                 self.board[(piece.y + rowfactor * counter)][piece.x + colfactor * counter][1] = piece.content
                 counter+=1
+                something_moved = True
 
             piece.x += (counter - 1)*colfactor
             piece.y += (counter - 1)*rowfactor
+        return something_moved
