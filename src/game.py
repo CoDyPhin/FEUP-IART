@@ -15,11 +15,21 @@ class Game:
                                 [['block','block'],         ['grass','empty'],          ['block','block'],          ['block','block'],          ['grass','empty']],
                                 [['block','block'],         ['grass','empty'],          ['grass','empty'],          ['grass','bPiece'],         ['block','block']],
                                 [['grass','gPiece'],        ['gCenter','empty'],        ['block','block'],          ['block','block'],          ['block','block']]])
+        staticboard2 = Board([[['block','block'],         ['block','block'],          ['block','block'],          ['block','block'],          ['grass','empty'],          ['block','block']],
+                                [['block', 'block'],        ['grass','rPiece'],         ['grass','empty'],          ['grass','empty'],          ['bCenter','empty'],          ['block','block']],
+                                [['grass','empty'],       ['grass','empty'],          ['rCenter','empty'],        ['grass','empty'],          ['block','block'],          ['block','block']],
+                                [['block','block'],         ['grass','empty'],          ['block','block'],          ['block','block'],          ['grass','empty'],          ['block','block']],
+                                [['block','block'],         ['grass','empty'],          ['grass','empty'],          ['grass','bPiece'],         ['block','block'],          ['block','block']],
+                                [['grass','gPiece'],        ['gCenter','empty'],        ['block','block'],          ['block','block'],          ['block','block'],          ['block','block']]])
+        staticboard3 = Board([[['block', 'block'],        ['grass','rPiece'],         ['grass','empty'],          ['grass','empty']],
+                                [['bCenter','empty'],       ['grass','empty'],          ['rCenter','empty'],        ['grass','bPiece']],
+                                [['block','block'],         ['grass','empty'],          ['block','block'],          ['block','block']],
+                                [['grass','gPiece'],        ['gCenter','empty'],        ['block','block'],          ['block','block']]])
         if self.settings.puzzledb == 1:
-            self.board = staticboard
+            self.board = staticboard3
         elif self.settings.puzzledb == 2:
             self.board = staticboard
         elif self.settings.puzzledb == 3:
-            self.board = staticboard
+            self.board = staticboard2
         elif self.settings.puzzledb == 4:
             self.board = staticboard
