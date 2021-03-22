@@ -8,6 +8,11 @@ class Board:
         self.centers = []
         self.retrieveCenters()
         self.retrievePieces()
+        self.parentBoard = None #   (?) trace path using search algorithms
+
+    def setParentBoard(self, board):
+        self.parentBoard = board
+        return self
 
     def retrieveCenters(self):
         for i in range(len(self.board)):
