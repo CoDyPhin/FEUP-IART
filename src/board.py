@@ -32,17 +32,12 @@ class Board:
                 return False
         return True
 
-
-    def move_up(self):
-        rowfactor = -1
-        colfactor = 0
+    def make_move(self, rowfactor, colfactor):
         rowsize = len(self.board)
         colsize = len(self.board[0])
         something_moved = False
-        self.pieces.sort(key=lambda a: a.y)
         for piece in self.pieces:
-            counter = 1
-            
+            counter = 1 
             while( ((piece.y + rowfactor*counter) in range(rowsize)) and ((piece.x + colfactor*counter) in range(colsize)) and (self.board[piece.y + rowfactor * counter][piece.x + colfactor * counter][1]=='empty')):
                 self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = 'empty'
                 self.board[(piece.y + rowfactor * counter)][piece.x + colfactor * counter][1] = piece.content
@@ -52,66 +47,31 @@ class Board:
             piece.x += (counter - 1)*colfactor
             piece.y += (counter - 1)*rowfactor
         return something_moved
+
+
+    def move_up(self):
+        rowfactor = -1
+        colfactor = 0
+        self.pieces.sort(key=lambda a: a.y)
+        return self.make_move(rowfactor, colfactor)
 
 
     def move_down(self):
         rowfactor = 1
         colfactor = 0
-        rowsize = len(self.board)
-        colsize = len(self.board[0])
-        something_moved = False
         self.pieces.sort(reverse=True, key=lambda a: a.y)
-        for piece in self.pieces:
-            counter = 1
-            
-            while( ((piece.y + rowfactor*counter) in range(rowsize)) and ((piece.x + colfactor*counter) in range(colsize)) and (self.board[piece.y + rowfactor * counter][piece.x + colfactor * counter][1]=='empty')):
-                self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = 'empty'
-                self.board[(piece.y + rowfactor * counter)][piece.x + colfactor * counter][1] = piece.content
-                counter+=1
-                something_moved = True
-
-            piece.x += (counter - 1)*colfactor
-            piece.y += (counter - 1)*rowfactor
-        return something_moved
+        return self.make_move(rowfactor, colfactor)
 
 
     def move_left(self):
         rowfactor = 0
         colfactor = -1
-        rowsize = len(self.board)
-        colsize = len(self.board[0])
-        something_moved = False
         self.pieces.sort(key=lambda a: a.x)
-        for piece in self.pieces:
-            counter = 1
-            
-            while( ((piece.y + rowfactor*counter) in range(rowsize)) and ((piece.x + colfactor*counter) in range(colsize)) and (self.board[piece.y + rowfactor * counter][piece.x + colfactor * counter][1]=='empty')):
-                self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = 'empty'
-                self.board[(piece.y + rowfactor * counter)][piece.x + colfactor * counter][1] = piece.content
-                counter+=1
-                something_moved = True
-
-            piece.x += (counter - 1)*colfactor
-            piece.y += (counter - 1)*rowfactor
-        return something_moved
+        return self.make_move(rowfactor, colfactor)
 
 
     def move_right(self):
         rowfactor = 0
         colfactor = 1
-        rowsize = len(self.board)
-        colsize = len(self.board[0])
-        something_moved = False
         self.pieces.sort(reverse=True, key=lambda a: a.x)
-        for piece in self.pieces:
-            counter = 1
-            
-            while( ((piece.y + rowfactor*counter) in range(rowsize)) and ((piece.x + colfactor*counter) in range(colsize)) and (self.board[piece.y + rowfactor * counter][piece.x + colfactor * counter][1]=='empty')):
-                self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = 'empty'
-                self.board[(piece.y + rowfactor * counter)][piece.x + colfactor * counter][1] = piece.content
-                counter+=1
-                something_moved = True
-
-            piece.x += (counter - 1)*colfactor
-            piece.y += (counter - 1)*rowfactor
-        return something_moved
+        return self.make_move(rowfactor, colfactor)
