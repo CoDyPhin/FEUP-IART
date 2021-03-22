@@ -43,11 +43,12 @@ for (key,value) in SPRITES_IMG.items():
     SPRITES[key] = pygame.transform.scale(value, (110, 110))
 
 def draw_board(board):
+    multfactor = 7-len(board)
     for i in range(len(board)):
         for j in range(len(board[i])):
             for k in range(2):
                 if(board[i][j][k] != 'empty'):
-                    SCREEN.blit(SPRITES[board[i][j][k]], (350+110*(j),100+110*(i)))
+                    SCREEN.blit(SPRITES[board[i][j][k]], (250+multfactor*50+110*(j),40*multfactor+110*(i)))
 
 
 def draw_stats(stats, receivedhint):
