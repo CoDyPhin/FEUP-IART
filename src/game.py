@@ -9,6 +9,7 @@ class Game:
         self.board = None
         self.stats = Stats()
         self.select_board()
+        self.dfs_visited = []
         
     def select_board(self):
         staticboard = Board([[['block', 'block'],        ['grass','rPiece'],         ['grass','empty'],          ['grass','empty'],          ['grass','empty']],
@@ -36,6 +37,25 @@ class Game:
             self.board = staticboard
 
     
+
+
+    def dfs(self, gameState):
+        stateCopy = copy.deepcopy(gameState)
+        
+        neighbours = [copy.deepcopy(gameState) for i in range(4)]
+        neighbour_boards = [neighbours[0].board.setParentBoard(gameState.board).move_up(), neighbours[1].board.setParentBoard(gameState.board).move_down(), neighbours[2].board.setParentBoard(gameState.board).move_left(), neighbours[3].board.setParentBoard(gameState.board).move_left()]
+        neighbours = [neighbours[i] for i in range(len(neighbours)) if neighbour_boards[i] == True]
+
+        if stateCopy.board not in self.dfs_visited:
+            self.dfs_visited.append(stateCopy.board)
+            for neighbour in neighbours:
+                if neighbour.board.check_game_over():
+                    print("Solution found in " + str(len(getPath(neighbour, []))) + " moves")
+                    gameState.stats.moves = len(getPath(neighbour, []))
+                    return neighbour
+                self.dfs(neighbour)
+
+    
     def bfs(self, gameState):
         rootBoard = gameState.board
         visited = [] # List to keep track of visited nodes.
@@ -52,7 +72,7 @@ class Game:
             for neighbour in neighbours:
                 if neighbour not in visited:
                     if neighbour.check_game_over():
-                        print("Solution found: " + str(len(getPath(neighbour, []))) + " moves")
+                        print("Solution found in " + str(len(getPath(neighbour, []))) + " moves")
                         gameState.stats.moves = len(getPath(neighbour, []))
                         return neighbour
                     visited.append(neighbour)
