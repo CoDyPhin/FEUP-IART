@@ -134,6 +134,8 @@ def game_loop():
     hint = "None"
     running = True
     GameState.stats.start_timer()
+    GameState.board = GameState.bfs(GameState)
+
     while running:
         gameover = GameState.board.check_game_over()
         running = not gameover
