@@ -9,7 +9,6 @@ pygame.init()
 
 # Game Settings
 BACKGRD_COLOR = (176,224,230)
-FPS = 60
 WIDTH, HEIGHT = 1280, 720
 BOARDSIZE = {"small":4, "medium":5, "big":6}
 
@@ -90,7 +89,7 @@ def draw_stats_screen(gamestate):
     stgstitle = titlefont.render("Settings Used: ", True, (0,0,139), BACKGRD_COLOR)
     mode = font.render("Game Mode: " + gamestate.settings.modestr, False, (0,0,255), BACKGRD_COLOR)
     search = font.render("Search Method: " + gamestate.settings.searchstr, False, (0,0,255), BACKGRD_COLOR)
-    heuristic = font.render("Heuristic Algorithm: " + gamestate.settings.heuristicstr, False, (0,0,255), BACKGRD_COLOR)
+    heuristic = font.render("Heuristic: " + gamestate.settings.heuristicstr, False, (0,0,255), BACKGRD_COLOR)
     puzzledb = font.render("Puzzle Database: " + gamestate.settings.puzzledbstr, False, (0,0,255), BACKGRD_COLOR)
     it = 0
     for text in [title, moves, time, stgstitle, mode, search, heuristic, puzzledb]:
@@ -129,13 +128,32 @@ def set_puzzle_selection(value, mode):
 
 def game_loop():
     GameState = Game(gamesettings)
-    clock = pygame.time.Clock()
+    if GameState.settings.mode == 1:
+        puzzle_finished = player_loop(GameState)
+    elif GameState.settings.mode == 2:
+        puzzle_finished = ai_loop(GameState)
+    if puzzle_finished:
+        while True:
+            draw_stats_screen(GameState)
+            keys = pygame.key.get_pressed()
+            if(keys[pygame.K_ESCAPE] or keys[pygame.K_SPACE]): break
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+
+
+def ai_loop(GameState):
+    GameState.stats.start_timer()
+    GameState.board = GameState.bfs(GameState)
+    GameState.stats.update_timer()
+    
+    return GameState.board.check_game_over()
+
+def player_loop(GameState):
     previouskey = "None"
     hint = "None"
     running = True
     GameState.stats.start_timer()
-    GameState.board = GameState.bfs(GameState)
-
     while running:
         gameover = GameState.board.check_game_over()
         running = not gameover
@@ -150,27 +168,18 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-    if gameover:
-        while True:
-            draw_stats_screen(GameState)
-            keys = pygame.key.get_pressed()
-            if(keys[pygame.K_ESCAPE] or keys[pygame.K_SPACE]): break
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    exit()
+    return GameState.board.check_game_over()
 
 
 main_menu = menu.Menu('Match The Tiles', WIDTH, HEIGHT, theme=menu.themes.THEME_BLUE)
 main_menu.add.button("Start game", game_loop)
 main_menu.add.selector("Mode: ", [('Player vs Puzzle', 1), ('AI vs Puzzle', 2)], onchange=set_mode)
-main_menu.add.selector("Search Method: ", [('Breadth-First Search', 1), ('Depth-First Search',2), ('Iterative Deepening',3), ('Uniform Cost',4)], onchange=set_search)
-main_menu.add.selector("Heuristic Algorithm: ", [('Greedy Search',1), ('A* Algorithm', 2)], onchange=set_heuristic)
+main_menu.add.selector("Search Method: ", [('Breadth-First Search', 1), ('Depth-First Search',2), ('Iterative Deepening',3), ('Uniform Cost',4), ('Greedy Search',5), ('A* Algorithm',6)], onchange=set_search)
+main_menu.add.selector("Heuristic: ", [('Simple Algorithm', 1), ('Complex Algorithm',2)], onchange=set_heuristic)
 main_menu.add.selector("Puzzle Database: ", [('Easy', 1), ('Medium', 2), ('Hard', 3), ('Random Generation', 4)], onchange=set_puzzle_selection)
 main_menu.add.button("Quit Game", menu.events.EXIT)
 
 def main():
-    clock = pygame.time.Clock()
-    previouskey = "None"
     running = True
     global gamesettings
     gamesettings = Settings(1,1,1,1)

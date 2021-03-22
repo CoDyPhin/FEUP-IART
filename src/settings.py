@@ -12,8 +12,8 @@ class Settings:
 
     def updatestrs(self):
         modedic = {1: 'Player vs Puzzle', 2: 'AI vs Puzzle'}
-        searchdic = {1: 'Breadth-First Search', 2: 'Depth-First Search', 3: 'Iterative Deepening', 4: 'Uniform Cost'}
-        heuristicdic = {1: 'Greedy Search', 2: 'A* Algorithm'}
+        searchdic = {1: 'Breadth-First Search', 2: 'Depth-First Search', 3: 'Iterative Deepening', 4: 'Uniform Cost', 5: "Greedy Search", 6: "A* Algorithm"}
+        heuristicdic = {1: 'Simple Algorithm', 2: 'Complex Algorithm'}
         puzzledbdic = {1: 'Easy', 2: 'Medium', 3: 'Hard', 4: 'Random Generation'}
         self.modestr = modedic[self.mode]
         self.searchstr = searchdic[self.search]
