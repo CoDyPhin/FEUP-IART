@@ -178,7 +178,10 @@ def ai_loop(GameState):
         pathlist = GameState.bfs(GameState)
 
     elif GameState.settings.search == 2:
-        print("Not yet implemented")
+        GameState.dfs(GameState)
+        pathlist = GameState.dfs_result
+        GameState.stats.moves = len(pathlist) - 1
+        print(pathlist)
 
     elif GameState.settings.search == 3:
         print("Not yet implemented")

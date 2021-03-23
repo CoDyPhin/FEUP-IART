@@ -10,6 +10,7 @@ class Game:
         self.stats = Stats()
         self.select_board()
         self.dfs_visited = []
+        self.dfs_result = []
         
     def select_board(self):
         staticboard = Board([[['block', 'block'],        ['grass','rPiece'],         ['grass','empty'],          ['grass','empty'],          ['grass','empty']],
@@ -38,7 +39,6 @@ class Game:
 
     
 
-
     def dfs(self, gameState):
         gameStateBoard = gameState.board
 
@@ -50,9 +50,9 @@ class Game:
             self.dfs_visited.append(gameStateBoard.board)
             for neighbour in neighbours:
                 if neighbour.board.check_game_over():
-                    print("Solution found in " + str(len(getPath(neighbour.board, []))) + " moves")
-                    gameState.stats.moves = len(getPath(neighbour.board, []))
-                    return neighbour
+                    result = getPath(neighbour.board, [])
+                    self.dfs_result = result
+                    return result
                 
                 self.dfs(neighbour)
     
