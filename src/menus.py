@@ -98,6 +98,16 @@ def draw_screen(gamestate, hint):
     draw_stats(gamestate.stats, hint)
     pygame.display.update()
 
+def draw_calculating_screen(gamestate):
+    titlefont = pygame.font.SysFont('Times New Roman', 35)
+    title = titlefont.render("Calculating solution...", True, (0,0,139), BACKGRD_COLOR)
+    title_rect = title.get_rect()
+    title_rect.center = (WIDTH//2,20)
+    SCREEN.fill(BACKGRD_COLOR)
+    draw_board(gamestate.board.board)
+    SCREEN.blit(title, title_rect)
+    pygame.display.update()
+
 def draw_stats_screen(gamestate):
     SCREEN.fill(BACKGRD_COLOR)
     titlefont = pygame.font.SysFont('Times New Roman', 50)
@@ -172,6 +182,8 @@ def draw_replay(pathlist, timestr):
         pygame.time.wait(500)
 
 def ai_loop(GameState):
+    draw_calculating_screen(GameState)
+    GameState.cleanstack()
     GameState.stats.start_timer()
     pathlist = []
     if GameState.settings.search == 1:
@@ -181,7 +193,7 @@ def ai_loop(GameState):
         GameState.dfs(GameState)
         pathlist = GameState.dfs_result
         GameState.stats.moves = len(pathlist) - 1
-        print(pathlist)
+        GameState.cleanstack()
 
     elif GameState.settings.search == 3:
         print("Not yet implemented")

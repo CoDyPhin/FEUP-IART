@@ -37,7 +37,9 @@ class Game:
         elif self.settings.puzzledb == 4:
             self.board = staticboard
 
-    
+    def cleanstack(self):
+        self.dfs_visited = []
+        self.dfs_result = []
 
     def dfs(self, gameState):
         gameStateBoard = gameState.board
