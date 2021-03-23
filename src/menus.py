@@ -47,16 +47,16 @@ def draw_board(board):
         for j in range(len(board[i])):
             for k in range(2):
                 if(board[i][j][k] != 'empty'):
-                    SCREEN.blit(SPRITES[board[i][j][k]], (250+multfactor*50+110*(j),40*multfactor+110*(i)))
+                    SCREEN.blit(SPRITES[board[i][j][k]], (250+multfactor*50+110*(j),45*multfactor+110*(i)))
 
 
 def draw_stats(stats, receivedhint):
     font = pygame.font.SysFont('Times New Roman', 25)
-    timer = font.render("Timer: " + stats.timestring, False, (0,0,139), BACKGRD_COLOR)
+    timer = font.render("Timer: " + stats.timestring, True, (0,0,139), BACKGRD_COLOR)
     timerRect = timer.get_rect()
     timerRect.topleft = (5, 50)
     SCREEN.blit(timer, timerRect)
-    moves = font.render("Moves: " + str(stats.moves), False, (0,0,139), BACKGRD_COLOR)
+    moves = font.render("Moves: " + str(stats.moves), True, (0,0,139), BACKGRD_COLOR)
     movesRect = moves.get_rect()
     movesRect.topleft = (5, 100)
     SCREEN.blit(moves, movesRect)
@@ -65,11 +65,30 @@ def draw_stats(stats, receivedhint):
     hintRect.topleft = (5, 200)
     SCREEN.blit(hint, hintRect)
     if(receivedhint != "None"):
-        rec_hint = font.render("Try moving " + receivedhint + "!", False, (0,0,139), (192,192,192))
+        rec_hint = font.render("Try moving " + receivedhint + "!", True, (0,0,139), (192,192,192))
         rec_hintRect = rec_hint.get_rect()
         rec_hintRect.topleft = (5,250)
         SCREEN.blit(rec_hint, rec_hintRect)
 
+def draw_replay_stats(timeused, moves):
+    titlefont = pygame.font.SysFont('Times New Roman', 35)
+    normalfont = pygame.font.SysFont('Times New Roman', 25)
+    replay = titlefont.render("Move Replay", True, (0,0,139), BACKGRD_COLOR)
+    replay_rect = replay.get_rect()
+    replay_rect.center = (WIDTH//2,20)
+    timetitle = titlefont.render("Time used:", True, (0,0,139), BACKGRD_COLOR)
+    timer = normalfont.render(timeused, True, (0,0,139), BACKGRD_COLOR)
+    timetitle_rect = timetitle.get_rect()
+    timer_rect = timer.get_rect()
+    timetitle_rect.topleft = (5,50)
+    timer_rect.topleft = (10, 100)
+    movetext = normalfont.render("Moves: " + str(moves), True, (0,0,139), BACKGRD_COLOR)
+    movetext_rect = movetext.get_rect()
+    movetext_rect.topleft = (10,150)
+    SCREEN.blit(replay, replay_rect)
+    SCREEN.blit(timetitle, timetitle_rect)
+    SCREEN.blit(timer, timer_rect)
+    SCREEN.blit(movetext, movetext_rect)
 
 # Screen drawing and updating
 
@@ -84,21 +103,23 @@ def draw_stats_screen(gamestate):
     titlefont = pygame.font.SysFont('Times New Roman', 50)
     font = pygame.font.SysFont('Times New Roman', 30)
     title = titlefont.render("Puzzle completed in:", True, (0,0,139), BACKGRD_COLOR)
-    moves = font.render("Moves: " + str(gamestate.stats.moves), False, (0,0,255), BACKGRD_COLOR)
-    time = font.render("Time: " + gamestate.stats.timestring, False, (0,0,255), BACKGRD_COLOR)
+    moves = font.render("Moves: " + str(gamestate.stats.moves), True, (0,0,255), BACKGRD_COLOR)
+    time = font.render("Time: " + gamestate.stats.timestring, True, (0,0,255), BACKGRD_COLOR)
     stgstitle = titlefont.render("Settings Used: ", True, (0,0,139), BACKGRD_COLOR)
-    mode = font.render("Game Mode: " + gamestate.settings.modestr, False, (0,0,255), BACKGRD_COLOR)
-    search = font.render("Search Method: " + gamestate.settings.searchstr, False, (0,0,255), BACKGRD_COLOR)
-    heuristic = font.render("Heuristic: " + gamestate.settings.heuristicstr, False, (0,0,255), BACKGRD_COLOR)
-    puzzledb = font.render("Puzzle Database: " + gamestate.settings.puzzledbstr, False, (0,0,255), BACKGRD_COLOR)
+    mode = font.render("Game Mode: " + gamestate.settings.modestr, True, (0,0,255), BACKGRD_COLOR)
+    search = font.render("Search Method: " + gamestate.settings.searchstr, True, (0,0,255), BACKGRD_COLOR)
+    heuristic = font.render("Heuristic: " + gamestate.settings.heuristicstr, True, (0,0,255), BACKGRD_COLOR)
+    puzzledb = font.render("Puzzle Database: " + gamestate.settings.puzzledbstr, True, (0,0,255), BACKGRD_COLOR)
     it = 0
-    for text in [title, moves, time, stgstitle, mode, search, heuristic, puzzledb]:
+    itlist = [title, moves, time, stgstitle, mode, search, puzzledb]
+    if gamestate.settings.search == 5 or gamestate.settings.search == 6: itlist.append(heuristic)
+    for text in itlist:
         it+=1
         rect = text.get_rect()
         rect.center = (WIDTH//2, 75*it)
         SCREEN.blit(text, rect)
     smallf = pygame.font.SysFont('Times New Roman', 20)
-    smallt = smallf.render("Press SPACE or ESC to continue to the main menu", False, (0,0,255), BACKGRD_COLOR)
+    smallt = smallf.render("Press SPACE or ESC to continue to the main menu", True, (0,0,255), BACKGRD_COLOR)
     smallt_rect = smallt.get_rect()
     smallt_rect.center = (WIDTH//2, HEIGHT-20)
     SCREEN.blit(smallt, smallt_rect)
@@ -142,11 +163,44 @@ def game_loop():
                     exit()
 
 
+def draw_replay(pathlist, timestr):
+    for i in range(len(pathlist)):
+        SCREEN.fill(BACKGRD_COLOR)
+        draw_replay_stats(timestr, i)
+        draw_board(pathlist[-(i+1)].board)
+        pygame.display.update()
+        pygame.time.wait(500)
+
 def ai_loop(GameState):
     GameState.stats.start_timer()
-    GameState.board = GameState.bfs(GameState)
-    GameState.stats.update_timer()
-    
+    pathlist = []
+    if GameState.settings.search == 1:
+        pathlist = GameState.bfs(GameState)
+
+    elif GameState.settings.search == 2:
+        print("Not yet implemented")
+
+    elif GameState.settings.search == 3:
+        print("Not yet implemented")
+
+    elif GameState.settings.search == 4:
+        print("Not yet implemented")
+
+    elif GameState.settings.search == 5:
+        if GameState.settings.heuristic == 1:
+            print("Not yet implemented")
+        elif GameState.settings.heuristic == 2:
+            print("Not yet implemented")
+
+    elif GameState.settings.search == 6:
+        if GameState.settings.heuristic == 1:
+            print("Not yet implemented")
+        elif GameState.settings.heuristic == 2:
+            print("Not yet implemented")
+    if(len(pathlist) != 0):
+        GameState.board = pathlist[0]
+        GameState.stats.update_timer()
+        draw_replay(pathlist, GameState.stats.timestring)
     return GameState.board.check_game_over()
 
 def player_loop(GameState):

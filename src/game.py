@@ -72,9 +72,9 @@ class Game:
             for neighbour in neighbours:
                 if neighbour not in visited:
                     if neighbour.check_game_over():
-                        print("Solution found in " + str(len(getPath(neighbour, []))) + " moves")
-                        gameState.stats.moves = len(getPath(neighbour, []))
-                        return neighbour
+                        #print("Solution found in " + str(len(getPath(neighbour, []))) + " moves")
+                        gameState.stats.moves = len(getPath(neighbour, []))-1
+                        return getPath(neighbour, [])
                     visited.append(neighbour)
                     queue.append(neighbour)
 
