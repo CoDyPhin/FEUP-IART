@@ -31,12 +31,12 @@ YELLOW_INSIDE_IMG = pygame.image.load(os.path.join('assets', 'yellowinside.png')
 PURPLE_INSIDE_IMG = pygame.image.load(os.path.join('assets', 'purpleinside.png'))
 
 # Sprite organizing
-SPRITES_IMG = {'bPiece': BLUE_PIECE_IMG, 'rPiece': RED_PIECE_IMG, 'gPiece': GREEN_PIECE_IMG, 'yPiece': YELLOW_PIECE_IMG, 'pPiece': PURPLE_PIECE_IMG, 
-'bCenter': BLUE_INSIDE_IMG, 'rCenter': RED_INSIDE_IMG, 'gCenter': GREEN_INSIDE_IMG, 'yCenter': YELLOW_INSIDE_IMG, 'pCenter': PURPLE_INSIDE_IMG}
+SPRITES_IMG = {'bP': BLUE_PIECE_IMG, 'rP': RED_PIECE_IMG, 'gP': GREEN_PIECE_IMG, 'yP': YELLOW_PIECE_IMG, 'pP': PURPLE_PIECE_IMG, 
+'bC': BLUE_INSIDE_IMG, 'rC': RED_INSIDE_IMG, 'gC': GREEN_INSIDE_IMG, 'yC': YELLOW_INSIDE_IMG, 'pC': PURPLE_INSIDE_IMG}
 
 BLOCK = pygame.transform.scale(BLOCK_IMG, (110, 110))
 GRASS = pygame.transform.scale(GRASS_IMG, (110, 110))
-SPRITES = {'block': BLOCK, 'grass': GRASS}
+SPRITES = {'x': BLOCK, 'o': GRASS}
 
 for (key,value) in SPRITES_IMG.items():
     SPRITES[key] = pygame.transform.scale(value, (110, 110))
@@ -46,7 +46,7 @@ def draw_board(board):
     for i in range(len(board)):
         for j in range(len(board[i])):
             for k in range(2):
-                if(board[i][j][k] != 'empty'):
+                if(board[i][j][k] != '-'):
                     SCREEN.blit(SPRITES[board[i][j][k]], (250+multfactor*50+110*(j),45*multfactor+110*(i)))
 
 
@@ -247,6 +247,7 @@ main_menu.add.selector("Search Method: ", [('Breadth-First Search', 1), ('Depth-
 main_menu.add.selector("Heuristic: ", [('Simple Algorithm', 1), ('Complex Algorithm',2)], onchange=set_heuristic)
 main_menu.add.selector("Puzzle Database: ", [('Easy', 1), ('Medium', 2), ('Hard', 3), ('Random Generation', 4)], onchange=set_puzzle_selection)
 main_menu.add.button("Quit Game", menu.events.EXIT)
+
 
 def main():
     running = True

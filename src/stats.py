@@ -21,7 +21,3 @@ class Stats:
         self.hours = timer.seconds // 3600
         self.timestring = "{hours:02d}h {minutes:02d}m {seconds:02d}s {milliseconds:03d}ms".format(hours=self.hours, minutes=self.minutes, seconds=self.seconds, milliseconds=self.ms)
 
-def timer():
-    while True:
-        stats.update_timer()
-        print(stats.timestring)

@@ -13,21 +13,23 @@ class Game:
         self.dfs_result = []
         
     def select_board(self):
-        staticboard = Board([[['block', 'block'],        ['grass','rPiece'],         ['grass','empty'],          ['grass','empty'],          ['grass','empty']],
-                                [['bCenter','empty'],       ['grass','empty'],          ['rCenter','empty'],        ['grass','empty'],          ['block','block']],
-                                [['block','block'],         ['grass','empty'],          ['block','block'],          ['block','block'],          ['grass','empty']],
-                                [['block','block'],         ['grass','empty'],          ['grass','empty'],          ['grass','bPiece'],         ['block','block']],
-                                [['grass','gPiece'],        ['gCenter','empty'],        ['block','block'],          ['block','block'],          ['block','block']]])
-        staticboard2 = Board([[['block','block'],         ['block','block'],          ['block','block'],          ['block','block'],          ['grass','empty'],          ['block','block']],
-                                [['block', 'block'],        ['grass','rPiece'],         ['grass','empty'],          ['grass','empty'],          ['bCenter','empty'],          ['block','block']],
-                                [['grass','empty'],       ['grass','empty'],          ['rCenter','empty'],        ['grass','empty'],          ['block','block'],          ['block','block']],
-                                [['block','block'],         ['grass','empty'],          ['block','block'],          ['block','block'],          ['grass','empty'],          ['block','block']],
-                                [['block','block'],         ['grass','empty'],          ['grass','empty'],          ['grass','bPiece'],         ['block','block'],          ['block','block']],
-                                [['grass','gPiece'],        ['gCenter','empty'],        ['block','block'],          ['block','block'],          ['block','block'],          ['block','block']]])
-        staticboard3 = Board([[['block', 'block'],        ['grass','rPiece'],         ['grass','empty'],          ['grass','empty']],
-                                [['bCenter','empty'],       ['grass','empty'],          ['rCenter','empty'],        ['grass','bPiece']],
-                                [['block','block'],         ['grass','empty'],          ['block','block'],          ['block','block']],
-                                [['grass','gPiece'],        ['gCenter','empty'],        ['block','block'],          ['block','block']]])
+        staticboard = Board([   [['x', 'x'],        ['o','rP'],     ['o','-'],     ['o','-'],      ['o','-']],
+                                [['bC','-'],        ['o','-'],      ['rC','-'],    ['o','-'],      ['x','x']],
+                                [['x','x'],         ['o','-'],      ['x','x'],     ['x','x'],      ['o','-']],
+                                [['x','x'],         ['o','-'],      ['o','-'],     ['o','bP'],     ['x','x']],
+                                [['o','gP'],        ['gC','-'],     ['x','x'],     ['x','x'],      ['x','x']]])
+
+        staticboard2 = Board([  [['x','x'],         ['x','x'],      ['x','x'],     ['x','x'],      ['o','-'],      ['x','x']],
+                                [['x', 'x'],        ['o','rP'],     ['o','-'],     ['o','-'],      ['bC','-'],     ['x','x']],
+                                [['o','-'],         ['o','-'],      ['rC','-'],    ['o','-'],      ['x','x'],      ['x','x']],
+                                [['x','x'],         ['o','-'],      ['x','x'],     ['x','x'],      ['o','-'],      ['x','x']],
+                                [['x','x'],         ['o','-'],      ['o','-'],     ['o','bP'],     ['x','x'],      ['x','x']],
+                                [['o','gP'],        ['gC','-'],     ['x','x'],     ['x','x'],      ['x','x'],      ['x','x']]])
+
+        staticboard3 = Board([  [['x', 'x'],        ['o','rP'],     ['o','-'],     ['o','-']],
+                                [['bC','-'],        ['o','-'],      ['rC','-'],    ['o','bP']],
+                                [['x','x'],         ['o','-'],      ['x','x'],     ['x','x']],
+                                [['o','gP'],        ['gC','-'],     ['x','x'],     ['x','x']]])
         if self.settings.puzzledb == 1:
             self.board = staticboard3
         elif self.settings.puzzledb == 2:

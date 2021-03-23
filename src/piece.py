@@ -3,7 +3,7 @@ class Center:
         self.x = x
         self.y = y
         self.color = color
-        self.content = color + "Center"
+        self.content = color + "C"
 
 class Piece:
     def __init__(self, x, y, destX, destY, color):
@@ -12,4 +12,4 @@ class Piece:
         self.destX = destX
         self.destY = destY
         self.color = color
-        self.content = color + "Piece"
+        self.content = color + "P"
