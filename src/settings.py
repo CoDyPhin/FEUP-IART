@@ -1,15 +1,17 @@
 class Settings:
-    def __init__(self, mode, search, heuristic, puzzledb, randompz):
+    def __init__(self, mode, search, memtrack, heuristic, puzzledb, randompz):
         self.mode = mode
         self.search = search
         self.heuristic = heuristic
         self.puzzledb = puzzledb
         self.randompz = randompz
+        self.memtrack = memtrack
         self.modestr = ""
         self.searchstr = ""
         self.heuristicstr = ""
         self.puzzledbstr = ""
         self.randomstr = ""
+        self.memtrackstr = ""
         self.updatestrs()
 
     def updatestrs(self):
@@ -23,3 +25,4 @@ class Settings:
         self.heuristicstr = heuristicdic[self.heuristic]
         self.puzzledbstr = puzzledbdic[self.puzzledb]
         self.randomstr = randomdic[self.randompz]
+        self.memtrackstr = randomdic[self.memtrack]

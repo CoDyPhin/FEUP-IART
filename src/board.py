@@ -1,5 +1,5 @@
-from piece import Center
-from piece import Piece
+from piece import *
+from piece import *
 
 class Board:
     def __init__(self, board):
