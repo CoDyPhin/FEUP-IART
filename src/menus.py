@@ -196,7 +196,9 @@ def ai_loop(GameState):
         GameState.cleanstack()
 
     elif GameState.settings.search == 3:
-        print("Not yet implemented")
+        pathlist = GameState.iterative_deepening(GameState)
+        GameState.stats.moves = len(pathlist) - 1
+        GameState.cleanstack()
 
     elif GameState.settings.search == 4:
         print("Not yet implemented")
