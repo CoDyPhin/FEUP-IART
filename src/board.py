@@ -18,22 +18,26 @@ class Board:
         for i in range(len(self.board)):
             colsize = len(self.board[0])
             for j in range(colsize):
-                if(self.board[i][j][0].find('C') != -1):
+                if('C' in self.board[i][j][0]):
                     self.centers.append(Center(j,i,self.board[i][j][0][0]))
 
     def retrievePieces(self):
         for i in range(len(self.board)):
             colsize = len(self.board[0])
             for j in range(colsize):
-                if(self.board[i][j][1].find('P') != -1):
+                destX = []
+                destY = []
+                if('P' in self.board[i][j][1]):
                     for center in self.centers:
                         if (center.color == self.board[i][j][1][0]):
-                            self.pieces.append(Piece(j,i,center.x,center.y,center.color))
+                            destX.append(center.x)
+                            destY.append(center.y)
+                    self.pieces.append(Piece(j,i,destX,destY,self.board[i][j][1][0]))
 
     
     def check_game_over(self):
         for piece in self.pieces:
-            if piece.x != piece.destX or piece.y != piece.destY:
+            if (piece.x,piece.y) not in [(piece.destX[i],piece.destY[i]) for i in range(len(piece.destX))]:
                 return False
         return True
 

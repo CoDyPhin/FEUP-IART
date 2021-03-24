@@ -30,14 +30,18 @@ class Game:
                                 [['bC','-'],        ['o','-'],      ['rC','-'],    ['o','bP']],
                                 [['x','x'],         ['o','-'],      ['x','x'],     ['x','x']],
                                 [['o','gP'],        ['gC','-'],     ['x','x'],     ['x','x']]])
+
+        staticboard4 = Board([   [['o', 'bP'],        ['x','x'],     ['bC','-'],     ['o','-'],      ['o','bP']],
+                                [['bC','-'],        ['o','-'],      ['o','-'],      ['o','-'],      ['x','x']],
+                                [['o','-'],         ['o','-'],     ['o','-'],     ['o','-'],      ['o','-']],
+                                [['x','x'],         ['x','x'],      ['x','x'],     ['o','-'],     ['o','-']],
+                                [['o','-'],        ['x','x'],     ['x','x'],     ['o','-'],      ['o','-']]])
         if self.settings.puzzledb == 1:
             self.board = staticboard3
         elif self.settings.puzzledb == 2:
             self.board = staticboard
         elif self.settings.puzzledb == 3:
-            self.board = staticboard2
-        elif self.settings.puzzledb == 4:
-            self.board = staticboard
+            self.board = staticboard4
 
     def cleanstack(self):
         self.dfs_visited = []
@@ -78,7 +82,7 @@ class Game:
                 if neighbour not in visited:
                     if neighbour.check_game_over():
                         #print("Solution found in " + str(len(getPath(neighbour, []))) + " moves")
-                        gameState.stats.moves = len(getPath(neighbour, []))-1
+                        gameState.stats.moves = len(getPath(neighbour, []))
                         return getPath(neighbour, [])
                     visited.append(neighbour)
                     queue.append(neighbour)
