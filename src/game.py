@@ -94,7 +94,6 @@ class Game:
             for neighbour in neighbours:
                 if neighbour not in visited:
                     if neighbour.check_game_over():
-                        #print("Solution found in " + str(len(getPath(neighbour, []))) + " moves")
                         gameState.stats.moves = len(getPath(neighbour, []))
                         return getPath(neighbour, [])
                     visited.append(neighbour)
@@ -154,14 +153,71 @@ class Game:
         
         return points
 
+    # def heuristics(self):
+    #     points = 0
+    #     gameStateBoard = self.board
+    #     points_list = []
+    #     for piece in gameStateBoard.pieces:
+    #         listCenters = zip(piece.destX, piece.destY)
+    #         for center in listCenters:
+    #             pointsAux = 0
+    #             if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
+    #             if center[1] == piece.y: pointsAux += check_obstaclesX(piece, center[1], gameStateBoard.board)
+    #             if center[0] != piece.x: pointsAux += 1
+    #             if center[1] != piece.y: pointsAux += 1
+    #             points_list.append(pointsAux)
+    #         points += min(points_list)
+        
+    #     return points
 
-    # def greedy_search(self, gameState):
-    #     current_node = gameState
 
-    #     while True:
-    #         if 
-    #         neighbours = current_node.neighbours()
-    #         node_to_expand = min(neighbours, key = lambda x: x.heuristics())    #Expands the node with max points
+
+    def greedy_search(self):
+        self.dfs_visited = []
+        start_node = copy.deepcopy(self)
+        current_node = copy.deepcopy(self)
+        while True:
+            self.dfs_visited.append(current_node.board.board)
+            
+            if current_node.board.check_game_over():
+                return getPath(current_node.board, [])
+           
+            neighbours = [x for x in current_node.neighbours() if x.board.board not in self.dfs_visited]
+
+            if len(neighbours) == 0:
+                self.dfs_visited.append(current_node.board.board)
+                current_node.board = current_node.board.parentBoard #BACKTRACK
+                continue
+
+            current_node = min(neighbours, key = lambda x: x.heuristics())    #Expands the node with max points
+        return None
+
+
+    def a_star_search(self):
+        self.dfs_visited = []
+        current = copy.deepcopy(self)
+        frontier = [current]
+        cost_so_far = {current: 0}
+
+        while frontier:
+            current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
+
+            if current.board.check_game_over():
+                return getPath(current.board, [])
+
+            neighbours = [x for x in current.neighbours() if x not in self.dfs_visited]
+
+            for next in neighbours:
+                self.dfs_visited.append(next)
+                new_cost = cost_so_far[current] + 1
+                if next not in cost_so_far or new_cost < cost_so_far[next]:
+                    cost_so_far[next] = new_cost
+                    frontier.append(next)
+            
+            frontier.remove(current)
+
+        print("Impossible")
+        return []
 
    
 

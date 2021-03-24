@@ -239,13 +239,20 @@ def ai_loop(GameState):
             GameState.heuristics(GameState)
             print("Not yet implemented")
         elif GameState.settings.heuristic == 2:
-            print("Not yet implemented")
+            pathlist = GameState.greedy_search()
+            GameState.stats.moves = len(pathlist) - 1
+            GameState.cleanstack()
 
     elif GameState.settings.search == 5:
         if GameState.settings.heuristic == 1:
             print("Not yet implemented")
         elif GameState.settings.heuristic == 2:
-            print("Not yet implemented")
+            pathlist = GameState.a_star_search()
+            GameState.stats.moves = len(pathlist)
+            GameState.cleanstack()
+
+
+
     if(len(pathlist) != 0):
         GameState.board = pathlist[0]
         GameState.stats.update_timer()
