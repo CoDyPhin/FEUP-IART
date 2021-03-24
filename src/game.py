@@ -52,15 +52,19 @@ class Game:
         self.dfs_result = []
         self.iddfs_result = []
 
+    def neighbours(self):
+        neighbours = [copy.deepcopy(self) for i in range(4)]
+        neighbour_boards = [neighbours[0].board.setParentBoard(self.board).move_up(), neighbours[1].board.setParentBoard(self.board).move_down(), neighbours[2].board.setParentBoard(self.board).move_left(), neighbours[3].board.setParentBoard(self.board).move_right()]
+        neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
+        return neighbours
+
 # Search Methods
 
     def dfs(self, gameState):
         gameStateBoard = gameState.board
         if gameStateBoard.board not in self.dfs_visited: 
             self.dfs_visited.append(gameStateBoard.board)
-            neighbours = [copy.deepcopy(gameState) for i in range(4)]
-            neighbour_boards = [neighbours[0].board.setParentBoard(gameStateBoard).move_up(), neighbours[1].board.setParentBoard(gameStateBoard).move_down(), neighbours[2].board.setParentBoard(gameStateBoard).move_left(), neighbours[3].board.setParentBoard(gameStateBoard).move_right()]
-            neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
+            neighbours = gameState.neighbours()
             self.stats.operations += len(neighbours)
             for neighbour in neighbours:
                 if neighbour.board.check_game_over():
@@ -76,8 +80,8 @@ class Game:
         queue = []      #   Initialize a queue
         visited.append(rootBoard)
         queue.append(rootBoard)
-        
         while queue:
+            self.stats.operations+=1
             s = queue.pop(0)
             neighbours = [copy.deepcopy(s).setParentBoard(s) for i in range(4)]
             neighbour_boards = [neighbours[0].move_up(), neighbours[1].move_down(), neighbours[2].move_left(), neighbours[3].move_right()]
@@ -86,7 +90,6 @@ class Game:
             for neighbour in neighbours:
                 if neighbour not in visited:
                     if neighbour.check_game_over():
-                        #print("Solution found in " + str(len(getPath(neighbour, []))) + " moves")
                         gameState.stats.moves = len(getPath(neighbour, []))
                         return getPath(neighbour, [])
                     visited.append(neighbour)
@@ -103,7 +106,7 @@ class Game:
                 result = getPath(self.iddfs_solution.board, [])
                 return result
             depth += 2
-            print(depth)
+            #print(depth)
 
 
     def iddfs(self, gameState, depth):
@@ -113,9 +116,7 @@ class Game:
         gameStateBoard = gameState.board
         self.dfs_visited.append(gameStateBoard.parentBoard)
         if gameStateBoard.board not in self.dfs_visited:
-            neighbours = [copy.deepcopy(gameState) for i in range(4)]
-            neighbour_boards = [neighbours[0].board.setParentBoard(gameStateBoard).move_up(), neighbours[1].board.setParentBoard(gameStateBoard).move_down(), neighbours[2].board.setParentBoard(gameStateBoard).move_left(), neighbours[3].board.setParentBoard(gameStateBoard).move_right()]
-            neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
+            neighbours = gameState.neighbours()
             self.stats.operations += len(neighbours)
             for neighbour in neighbours:
                 if neighbour.board.check_game_over():
@@ -125,20 +126,20 @@ class Game:
                 self.iddfs(neighbour, depth-1)
 
 
-    def heuristics(self):
-        points = 0
-        gameStateBoard = self.board
-        for piece in gameStateBoard.pieces:
-            listCenters = zip(piece.destX, piece.destY)
-            for center in listCenters:
-                if center[0] == piece.x: points += check_obstaclesX(piece, center[0], gameStateBoard.board)
-                if center[1] == piece.y: points += check_obstaclesX(piece, center[1], gameStateBoard.board)
-                if center[0] != piece.x: points += 1
-                if center[1] != piece.y: points += 1
-        
-        return points
+# Util functions
 
+def heuristics(self):
+    points = 0
+    gameStateBoard = self.board
+    for piece in gameStateBoard.pieces:
+        listCenters = zip(piece.destX, piece.destY)
+        for center in listCenters:
+            if center[0] == piece.x: points += check_obstaclesX(piece, center[0], gameStateBoard.board)
+            if center[1] == piece.y: points += check_obstaclesX(piece, center[1], gameStateBoard.board)
+            if center[0] != piece.x: points += 1
+            if center[1] != piece.y: points += 1
 
+    return points
 
 def check_obstaclesX(piece, centerX, board):
     iterMin = min(piece.x, centerX)
@@ -147,15 +148,12 @@ def check_obstaclesX(piece, centerX, board):
         if board[piece.y][i][0] == "block":  return 2
     return 0
 
-
 def check_obstaclesY(piece, centerY, board):
     iterMin = min(piece.y, centerY)
     iterMax = max(piece.y, centerY)
     for i in range(iterMin, iterMax):
         if board[i][piece.x][0] == "block": return 2
     return 0
-
-
 
 def getPath(board, listBoards):
     if (board.parentBoard == None):
