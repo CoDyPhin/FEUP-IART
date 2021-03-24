@@ -163,11 +163,11 @@ def set_mode(value, mode):
 
 def set_search(value, mode):
     #print("Not yet implemented")
-    if gamesettings.search in [5,6] and mode not in [5,6]:
+    if gamesettings.search in [4,5] and mode not in [4,5]:
         main_menu.remove_widget(quitbtn)
         main_menu.remove_widget(heuristicbtn)
         main_menu.add.generic_widget(quitbtn)
-    elif gamesettings.search not in [5,6] and mode in [5,6]: 
+    elif gamesettings.search not in [4,5] and mode in [4,5]: 
         main_menu.remove_widget(quitbtn)
         main_menu.add.generic_widget(heuristicbtn)
         main_menu.add.generic_widget(quitbtn)
@@ -234,16 +234,12 @@ def ai_loop(GameState):
         GameState.cleanstack()
 
     elif GameState.settings.search == 4:
-        print("Not yet implemented")
-
-    elif GameState.settings.search == 5:
         if GameState.settings.heuristic == 1:
             print("Not yet implemented")
         elif GameState.settings.heuristic == 2:
             print("Not yet implemented")
 
-
-    elif GameState.settings.search == 6:
+    elif GameState.settings.search == 5:
         if GameState.settings.heuristic == 1:
             print("Not yet implemented")
         elif GameState.settings.heuristic == 2:
@@ -281,7 +277,7 @@ main_menu.add.button("Start game", game_loop)
 main_menu.add.selector("Puzzle Difficulty: ", [('Easy', 1), ('Medium', 2), ('Hard', 3)], onchange=set_puzzle_selection)
 main_menu.add.selector("Random Puzzle Generation: ", [('Off', 1), ('On', 2)], onchange=set_random_puzzle)
 main_menu.add.selector("Mode: ", [('Player vs Puzzle', 1), ('AI vs Puzzle', 2)], onchange=set_mode)
-searchbtn = main_menu.add.selector("Search Method: ", [('Breadth-First Search', 1), ('Depth-First Search',2), ('Iterative Deepening',3), ('Uniform Cost',4), ('Greedy Search',5), ('A* Algorithm',6)], onchange=set_search)
+searchbtn = main_menu.add.selector("Search Method: ", [('Breadth-First Search', 1), ('Depth-First Search',2), ('Iterative Deepening',3), ('Greedy Search',4), ('A* Algorithm',5)], onchange=set_search)
 heuristicbtn = main_menu.add.selector("Heuristic: ", [('Simple Algorithm', 1), ('Complex Algorithm',2)], onchange=set_heuristic)
 quitbtn = main_menu.add.button("Quit Game", menu.events.EXIT)
 main_menu.remove_widget(searchbtn)

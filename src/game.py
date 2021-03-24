@@ -51,12 +51,15 @@ class Game:
 
     def dfs(self, gameState):
         gameStateBoard = gameState.board
-        neighbours = [copy.deepcopy(gameState) for i in range(4)]
-        neighbour_boards = [neighbours[0].board.setParentBoard(gameStateBoard).move_up(), neighbours[1].board.setParentBoard(gameStateBoard).move_down(), neighbours[2].board.setParentBoard(gameStateBoard).move_left(), neighbours[3].board.setParentBoard(gameStateBoard).move_right()]
-        neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
-        self.stats.memoryused += len(neighbours)
-        if gameStateBoard.board not in self.dfs_visited:
+        if gameStateBoard.board not in self.dfs_visited: # MANO CAIO MUDEI ISTO DE SÍTIO E ACHO QUE DÁ NA MESMA
+                                                            # MAS SÃO 3 DA MATINA E N TENHO A CERTEZA; 
+                                                            # DIMINUI TOTIL O TEMPO MAS RIP AS STATS PQ FICAM IGUAIS XD
             self.dfs_visited.append(gameStateBoard.board)
+            neighbours = [copy.deepcopy(gameState) for i in range(4)]
+            neighbour_boards = [neighbours[0].board.setParentBoard(gameStateBoard).move_up(), neighbours[1].board.setParentBoard(gameStateBoard).move_down(), neighbours[2].board.setParentBoard(gameStateBoard).move_left(), neighbours[3].board.setParentBoard(gameStateBoard).move_right()]
+            neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
+            self.stats.memoryused += len(neighbours)
+        
             for neighbour in neighbours:
                 self.stats.operations +=1
                 if neighbour.board.check_game_over():
@@ -93,29 +96,34 @@ class Game:
         depth = 1
         self.iddfs_result = None
         while True:     #BEWARE OF IMPOSSIBLE PUZZLES
+            self.dfs_visited = []
             self.iddfs(gameState, depth)
             if self.iddfs_solution != None:
                 result = getPath(self.iddfs_solution.board, [])
                 return result
-            depth *= 2
+            depth += 2
+            #print(depth)
 
 
     def iddfs(self, gameState, depth):
-        gameStateBoard = gameState.board
-
-        neighbours = [copy.deepcopy(gameState) for i in range(4)]
-        neighbour_boards = [neighbours[0].board.setParentBoard(gameStateBoard).move_up(), neighbours[1].board.setParentBoard(gameStateBoard).move_down(), neighbours[2].board.setParentBoard(gameStateBoard).move_left(), neighbours[3].board.setParentBoard(gameStateBoard).move_right()]
-        neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
-
         if (depth == 0):
             return None
 
-        for neighbour in neighbours:
-            if neighbour.board.check_game_over():
-                self.iddfs_solution = neighbour
-                return neighbour
-            
-            self.iddfs(neighbour, depth-1)
+        gameStateBoard = gameState.board
+        if gameStateBoard.board not in self.dfs_visited: # MANO CAIO MUDEI ISTO DE SÍTIO E ACHO QUE DÁ NA MESMA
+                                                            # MAS SÃO 3 DA MATINA E N TENHO A CERTEZA; 
+                                                            # DIMINUI TOTIL O TEMPO MAS RIP AS STATS PQ FICAM IGUAIS XD
+            self.dfs_visited.append(gameStateBoard.board) # ISTO DEVIA ESTAR A ENCONTRAR PRIMEIRO A SOLUÇÃO COM 10 MOVES MAS ENCONTRA A DE 21 DESDE QUE ADICIONEI O VISITED, WTF???
+            neighbours = [copy.deepcopy(gameState) for i in range(4)]
+            neighbour_boards = [neighbours[0].board.setParentBoard(gameStateBoard).move_up(), neighbours[1].board.setParentBoard(gameStateBoard).move_down(), neighbours[2].board.setParentBoard(gameStateBoard).move_left(), neighbours[3].board.setParentBoard(gameStateBoard).move_right()]
+            neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
+ 
+            for neighbour in neighbours:
+                if neighbour.board.check_game_over():
+                    self.iddfs_solution = neighbour
+                    return neighbour
+                
+                self.iddfs(neighbour, depth-1)
 
 
 def getPath(board, listBoards):
