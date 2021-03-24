@@ -208,6 +208,7 @@ def game_loop():
 
 def draw_replay(pathlist, timestr):
     for i in range(len(pathlist)):
+        pygame.event.pump()
         SCREEN.fill(BACKGRD_COLOR)
         draw_replay_stats(timestr, i)
         draw_board(pathlist[-(i+1)].board)
@@ -235,6 +236,7 @@ def ai_loop(GameState):
 
     elif GameState.settings.search == 4:
         if GameState.settings.heuristic == 1:
+            GameState.heuristics(GameState)
             print("Not yet implemented")
         elif GameState.settings.heuristic == 2:
             print("Not yet implemented")
@@ -261,6 +263,7 @@ def player_loop(GameState):
         if gameover: break
         if(pygame.key.get_pressed()[pygame.K_h]):
             hint = "Not yet implemented" #get_hint(GameState.settings): (...) return up; down; right; left
+        #print(GameState.heuristics(GameState))
         draw_screen(GameState, hint)
         previouskey2 = handle_movement(GameState, previouskey)
         if(previouskey2 != previouskey): hint = "None"
