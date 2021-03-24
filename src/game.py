@@ -10,6 +10,7 @@ class Game:
         self.stats = Stats()
         self.select_board()
         self.dfs_visited = []
+        self.iddfs_solution = None
         self.dfs_result = []
         
     def select_board(self):
@@ -46,6 +47,7 @@ class Game:
     def cleanstack(self):
         self.dfs_visited = []
         self.dfs_result = []
+        self.iddfs_result = []
 
     def dfs(self, gameState):
         gameStateBoard = gameState.board
@@ -62,8 +64,7 @@ class Game:
                     self.dfs_result = result
                     return result
                 self.dfs(neighbour)
-                
-        
+
     
     def bfs(self, gameState):
         rootBoard = gameState.board
@@ -86,6 +87,35 @@ class Game:
                         return getPath(neighbour, [])
                     visited.append(neighbour)
                     queue.append(neighbour)
+
+
+    def iterative_deepening(self, gameState):
+        depth = 1
+        self.iddfs_result = None
+        while True:     #BEWARE OF IMPOSSIBLE PUZZLES
+            self.iddfs(gameState, depth)
+            if self.iddfs_solution != None:
+                result = getPath(self.iddfs_solution.board, [])
+                return result
+            depth *= 2
+
+
+    def iddfs(self, gameState, depth):
+        gameStateBoard = gameState.board
+
+        neighbours = [copy.deepcopy(gameState) for i in range(4)]
+        neighbour_boards = [neighbours[0].board.setParentBoard(gameStateBoard).move_up(), neighbours[1].board.setParentBoard(gameStateBoard).move_down(), neighbours[2].board.setParentBoard(gameStateBoard).move_left(), neighbours[3].board.setParentBoard(gameStateBoard).move_right()]
+        neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
+
+        if (depth == 0):
+            return None
+
+        for neighbour in neighbours:
+            if neighbour.board.check_game_over():
+                self.iddfs_solution = neighbour
+                return neighbour
+            
+            self.iddfs(neighbour, depth-1)
 
 
 def getPath(board, listBoards):
