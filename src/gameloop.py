@@ -56,13 +56,34 @@ def ai_loop(GameState):
         if GameState.settings.heuristic == 1:
             print("Not yet implemented")
         elif GameState.settings.heuristic == 2:
-            print("Not yet implemented")
+            
+            if GameState.settings.memtrack == 2:
+                tracemalloc.start()
+            pathlist = GameState.greedy_search()
+
+            if GameState.settings.memtrack == 2:
+                GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
+                tracemalloc.stop()
+                
+            GameState.stats.moves = len(pathlist)
+            GameState.cleanstack()
+
 
     elif GameState.settings.search == 5:
         if GameState.settings.heuristic == 1:
             print("Not yet implemented")
         elif GameState.settings.heuristic == 2:
-            print("Not yet implemented")
+            if GameState.settings.memtrack == 2:
+                tracemalloc.start()
+            pathlist = GameState.a_star_search()
+
+            if GameState.settings.memtrack == 2:
+                GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
+                tracemalloc.stop()
+            
+            GameState.stats.moves = len(pathlist)
+            GameState.cleanstack()
+
     
     if(len(pathlist) != 0):
         GameState.board = pathlist[0]
