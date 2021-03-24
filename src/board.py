@@ -18,14 +18,14 @@ class Board:
         for i in range(len(self.board)):
             colsize = len(self.board[0])
             for j in range(colsize):
-                if(self.board[i][j][0].find('Center') != -1):
+                if(self.board[i][j][0].find('C') != -1):
                     self.centers.append(Center(j,i,self.board[i][j][0][0]))
 
     def retrievePieces(self):
         for i in range(len(self.board)):
             colsize = len(self.board[0])
             for j in range(colsize):
-                if(self.board[i][j][1].find('Piece') != -1):
+                if(self.board[i][j][1].find('P') != -1):
                     for center in self.centers:
                         if (center.color == self.board[i][j][1][0]):
                             self.pieces.append(Piece(j,i,center.x,center.y,center.color))
@@ -43,8 +43,8 @@ class Board:
         something_moved = False
         for piece in self.pieces:
             counter = 1 
-            while( ((piece.y + rowfactor*counter) in range(rowsize)) and ((piece.x + colfactor*counter) in range(colsize)) and (self.board[piece.y + rowfactor * counter][piece.x + colfactor * counter][1]=='empty')):
-                self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = 'empty'
+            while( ((piece.y + rowfactor*counter) in range(rowsize)) and ((piece.x + colfactor*counter) in range(colsize)) and (self.board[piece.y + rowfactor * counter][piece.x + colfactor * counter][1]=='-')):
+                self.board[(piece.y + rowfactor * (counter-1))][piece.x + colfactor*(counter-1)][1] = '-'
                 self.board[(piece.y + rowfactor * counter)][piece.x + colfactor * counter][1] = piece.content
                 counter+=1
                 something_moved = True

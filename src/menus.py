@@ -31,12 +31,12 @@ YELLOW_INSIDE_IMG = pygame.image.load(os.path.join('assets', 'yellowinside.png')
 PURPLE_INSIDE_IMG = pygame.image.load(os.path.join('assets', 'purpleinside.png'))
 
 # Sprite organizing
-SPRITES_IMG = {'bPiece': BLUE_PIECE_IMG, 'rPiece': RED_PIECE_IMG, 'gPiece': GREEN_PIECE_IMG, 'yPiece': YELLOW_PIECE_IMG, 'pPiece': PURPLE_PIECE_IMG, 
-'bCenter': BLUE_INSIDE_IMG, 'rCenter': RED_INSIDE_IMG, 'gCenter': GREEN_INSIDE_IMG, 'yCenter': YELLOW_INSIDE_IMG, 'pCenter': PURPLE_INSIDE_IMG}
+SPRITES_IMG = {'bP': BLUE_PIECE_IMG, 'rP': RED_PIECE_IMG, 'gP': GREEN_PIECE_IMG, 'yP': YELLOW_PIECE_IMG, 'pP': PURPLE_PIECE_IMG, 
+'bC': BLUE_INSIDE_IMG, 'rC': RED_INSIDE_IMG, 'gC': GREEN_INSIDE_IMG, 'yC': YELLOW_INSIDE_IMG, 'pC': PURPLE_INSIDE_IMG}
 
 BLOCK = pygame.transform.scale(BLOCK_IMG, (110, 110))
 GRASS = pygame.transform.scale(GRASS_IMG, (110, 110))
-SPRITES = {'block': BLOCK, 'grass': GRASS}
+SPRITES = {'x': BLOCK, 'o': GRASS}
 
 for (key,value) in SPRITES_IMG.items():
     SPRITES[key] = pygame.transform.scale(value, (110, 110))
@@ -46,7 +46,7 @@ def draw_board(board):
     for i in range(len(board)):
         for j in range(len(board[i])):
             for k in range(2):
-                if(board[i][j][k] != 'empty'):
+                if(board[i][j][k] != '-'):
                     SCREEN.blit(SPRITES[board[i][j][k]], (250+multfactor*50+110*(j),45*multfactor+110*(i)))
 
 
@@ -116,17 +116,29 @@ def draw_stats_screen(gamestate):
     moves = font.render("Moves: " + str(gamestate.stats.moves), True, (0,0,255), BACKGRD_COLOR)
     time = font.render("Time: " + gamestate.stats.timestring, True, (0,0,255), BACKGRD_COLOR)
     stgstitle = titlefont.render("Settings Used: ", True, (0,0,139), BACKGRD_COLOR)
-    mode = font.render("Game Mode: " + gamestate.settings.modestr, True, (0,0,255), BACKGRD_COLOR)
-    search = font.render("Search Method: " + gamestate.settings.searchstr, True, (0,0,255), BACKGRD_COLOR)
-    heuristic = font.render("Heuristic: " + gamestate.settings.heuristicstr, True, (0,0,255), BACKGRD_COLOR)
-    puzzledb = font.render("Puzzle Database: " + gamestate.settings.puzzledbstr, True, (0,0,255), BACKGRD_COLOR)
+    puzzledb = font.render("Puzzle Difficulty: " + gamestate.settings.puzzledbstr, True, (0,0,255), BACKGRD_COLOR)
+    puzzlernd = font.render("Random Puzzle Generation: " + gamestate.settings.randomstr, True, (0,0,255), BACKGRD_COLOR)
+    itlist = [title, moves, time]
+    if gamestate.settings.mode == 2:
+        itfactor = 65
+        mode = font.render("Game Mode: " + gamestate.settings.modestr, True, (0,0,255), BACKGRD_COLOR)
+        search = font.render("Search Method: " + gamestate.settings.searchstr, True, (0,0,255), BACKGRD_COLOR)
+        operations = font.render("Number of operations : " + str(gamestate.stats.operations) + " iterations", True, (0,0,255), BACKGRD_COLOR)
+        memory = font.render("Memory used: " + str(gamestate.stats.memoryused) + " boards created", True, (0,0,255), BACKGRD_COLOR)
+        itlist += [operations, memory, stgstitle, mode, search]
+        if gamestate.settings.search in [5,6]:
+            heuristic = font.render("Heuristic: " + gamestate.settings.heuristicstr, True, (0,0,255), BACKGRD_COLOR)
+            itlist += [heuristic]
+        itlist += [puzzledb]
+    elif gamestate.settings.mode == 1:
+        itfactor = 100
+        itlist += [stgstitle, puzzledb, puzzlernd]
+
     it = 0
-    itlist = [title, moves, time, stgstitle, mode, search, puzzledb]
-    if gamestate.settings.search == 5 or gamestate.settings.search == 6: itlist.append(heuristic)
     for text in itlist:
         it+=1
         rect = text.get_rect()
-        rect.center = (WIDTH//2, 75*it)
+        rect.center = (WIDTH//2, itfactor*it)
         SCREEN.blit(text, rect)
     smallf = pygame.font.SysFont('Times New Roman', 20)
     smallt = smallf.render("Press SPACE or ESC to continue to the main menu", True, (0,0,255), BACKGRD_COLOR)
@@ -140,11 +152,29 @@ def set_mode(value, mode):
     #print("Not yet implemented")
     gamesettings.mode = mode
     gamesettings.updatestrs()
+    if(mode == 2):
+        main_menu.remove_widget(quitbtn)
+        main_menu.add.generic_widget(searchbtn)
+        main_menu.add.generic_widget(quitbtn)
+    elif(mode == 1):
+        main_menu.remove_widget(quitbtn)
+        main_menu.remove_widget(searchbtn)
+        main_menu.add.generic_widget(quitbtn)
 
 def set_search(value, mode):
     #print("Not yet implemented")
+    if gamesettings.search in [5,6] and mode not in [5,6]:
+        main_menu.remove_widget(quitbtn)
+        main_menu.remove_widget(heuristicbtn)
+        main_menu.add.generic_widget(quitbtn)
+    elif gamesettings.search not in [5,6] and mode in [5,6]: 
+        main_menu.remove_widget(quitbtn)
+        main_menu.add.generic_widget(heuristicbtn)
+        main_menu.add.generic_widget(quitbtn)
     gamesettings.search = mode
     gamesettings.updatestrs()
+        
+        
 
 def set_heuristic(value, mode):
     #print("Not yet implemented")
@@ -156,6 +186,9 @@ def set_puzzle_selection(value, mode):
     gamesettings.puzzledb = mode
     gamesettings.updatestrs()
 
+def set_random_puzzle(value, mode):
+    gamesettings.random = mode
+    gamesettings.updatestrs()
 
 def game_loop():
     GameState = Game(gamesettings)
@@ -209,6 +242,7 @@ def ai_loop(GameState):
         elif GameState.settings.heuristic == 2:
             print("Not yet implemented")
 
+
     elif GameState.settings.search == 6:
         if GameState.settings.heuristic == 1:
             print("Not yet implemented")
@@ -227,8 +261,8 @@ def player_loop(GameState):
     GameState.stats.start_timer()
     while running:
         gameover = GameState.board.check_game_over()
-        running = not gameover
         GameState.stats.update_timer()
+        if gameover: break
         if(pygame.key.get_pressed()[pygame.K_h]):
             hint = "Not yet implemented" #get_hint(GameState.settings): (...) return up; down; right; left
         draw_screen(GameState, hint)
@@ -239,21 +273,24 @@ def player_loop(GameState):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-    return GameState.board.check_game_over()
+    return gameover
 
 
 main_menu = menu.Menu('Match The Tiles', WIDTH, HEIGHT, theme=menu.themes.THEME_BLUE)
 main_menu.add.button("Start game", game_loop)
+main_menu.add.selector("Puzzle Difficulty: ", [('Easy', 1), ('Medium', 2), ('Hard', 3)], onchange=set_puzzle_selection)
+main_menu.add.selector("Random Puzzle Generation: ", [('Off', 1), ('On', 2)], onchange=set_random_puzzle)
 main_menu.add.selector("Mode: ", [('Player vs Puzzle', 1), ('AI vs Puzzle', 2)], onchange=set_mode)
-main_menu.add.selector("Search Method: ", [('Breadth-First Search', 1), ('Depth-First Search',2), ('Iterative Deepening',3), ('Uniform Cost',4), ('Greedy Search',5), ('A* Algorithm',6)], onchange=set_search)
-main_menu.add.selector("Heuristic: ", [('Simple Algorithm', 1), ('Complex Algorithm',2)], onchange=set_heuristic)
-main_menu.add.selector("Puzzle Database: ", [('Easy', 1), ('Medium', 2), ('Hard', 3), ('Random Generation', 4)], onchange=set_puzzle_selection)
-main_menu.add.button("Quit Game", menu.events.EXIT)
+searchbtn = main_menu.add.selector("Search Method: ", [('Breadth-First Search', 1), ('Depth-First Search',2), ('Iterative Deepening',3), ('Uniform Cost',4), ('Greedy Search',5), ('A* Algorithm',6)], onchange=set_search)
+heuristicbtn = main_menu.add.selector("Heuristic: ", [('Simple Algorithm', 1), ('Complex Algorithm',2)], onchange=set_heuristic)
+quitbtn = main_menu.add.button("Quit Game", menu.events.EXIT)
+main_menu.remove_widget(searchbtn)
+main_menu.remove_widget(heuristicbtn)
 
 def main():
     running = True
     global gamesettings
-    gamesettings = Settings(1,1,1,1)
+    gamesettings = Settings(1,1,1,1,1)
     while running:
         events = pygame.event.get()
         for event in events:
