@@ -45,47 +45,20 @@ class Game:
 
     def dfs(self, gameState):
         gameStateBoard = gameState.board
-
         neighbours = [copy.deepcopy(gameState) for i in range(4)]
         neighbour_boards = [neighbours[0].board.setParentBoard(gameStateBoard).move_up(), neighbours[1].board.setParentBoard(gameStateBoard).move_down(), neighbours[2].board.setParentBoard(gameStateBoard).move_left(), neighbours[3].board.setParentBoard(gameStateBoard).move_right()]
         neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
-
+        self.stats.memoryused += len(neighbours)
         if gameStateBoard.board not in self.dfs_visited:
             self.dfs_visited.append(gameStateBoard.board)
             for neighbour in neighbours:
+                self.stats.operations +=1
                 if neighbour.board.check_game_over():
                     result = getPath(neighbour.board, [])
                     self.dfs_result = result
                     return result
-                
                 self.dfs(neighbour)
-    
-    
-    # def dfs(self, gameState):   #iterative
-    #     where_to_go_next = []
-    #     self.dfs_visited = []
-    #     where_to_go_next.append(gameState)
-
-    #     while where_to_go_next:
-    #         current_node = where_to_go_next.pop(-1)
-    #         self.dfs_visited.append(current_node.board)
-            
-    #         if current_node.check_game_over():
-    #             print("Found solution in " + str(len(getPath(current_node, [])))+ " moves")
-    #             return current_node
-
-    #         neighbours = [copy.deepcopy(current_node).setParentBoard(current_node) for i in range(4)]
-    #         neighbour_boards = [neighbours[0].move_up(), neighbours[1].move_down(), neighbours[2].move_left(), neighbours[3].move_right()]
-    #         neighbours = [neighbours[i] for i in range(len(neighbours)) if neighbour_boards[i]]
-            
-    #         for neighbour in neighbours:
-
-    #             if neighbour.board not in self.dfs_visited:
-    #                 where_to_go_next.append(neighbour)
                 
-
-
-
         
     
     def bfs(self, gameState):
@@ -94,13 +67,13 @@ class Game:
         queue = []      #   Initialize a queue
         visited.append(rootBoard)
         queue.append(rootBoard)
-
         while queue:
+            self.stats.operations+=1
             s = queue.pop(0)
             neighbours = [copy.deepcopy(s).setParentBoard(s) for i in range(4)]
             neighbour_boards = [neighbours[0].move_up(), neighbours[1].move_down(), neighbours[2].move_left(), neighbours[3].move_right()]
             neighbours = [neighbours[i] for i in range(len(neighbours)) if neighbour_boards[i] == True]
-
+            self.stats.memoryused += len(neighbours)
             for neighbour in neighbours:
                 if neighbour not in visited:
                     if neighbour.check_game_over():

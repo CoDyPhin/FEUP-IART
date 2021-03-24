@@ -13,3 +13,4 @@ class Piece:
         self.destY = destY
         self.color = color
         self.content = color + "P"
+

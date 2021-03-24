@@ -7,6 +7,8 @@ class Stats:
         self.minutes = 0
         self.hours = 0
         self.moves = 0
+        self.operations = 0
+        self.memoryused = 0
         self.timestring = "{hours:02d}h {minutes:02d}m {seconds:02d}s {milliseconds:03d}ms".format(hours=self.hours, minutes=self.minutes, seconds=self.seconds,  milliseconds=self.ms)
         self.starttime = None
 
