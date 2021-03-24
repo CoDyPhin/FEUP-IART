@@ -128,6 +128,17 @@ class Game:
 
     
 
+    def simple_heuristics(self):
+        points = 0
+        gameStateBoard = self.board
+        for piece in gameStateBoard.pieces:
+            listCenters = zip(piece.destX, piece.destY)
+            for center in listCenters:
+                if center[0] != piece.x: points += 1
+                if center[1] != piece.y: points += 1
+        
+        return points
+
 
 
     def heuristics(self):
@@ -162,7 +173,7 @@ class Game:
 
 
 
-    def greedy_search(self):
+    def greedy_search(self, easy = False):
         self.dfs_visited = []
         start_node = copy.deepcopy(self)
         current_node = copy.deepcopy(self)
@@ -178,19 +189,24 @@ class Game:
                 self.dfs_visited.append(current_node.board.board)
                 current_node.board = current_node.board.parentBoard #BACKTRACK
                 continue
-
-            current_node = min(neighbours, key = lambda x: x.heuristics())    #Expands the node with max points
+            
+            if not easy:
+                current_node = min(neighbours, key = lambda x: x.heuristics())    #Expands the node with max points
+            else:
+                current_node = min(neighbours, key = lambda x: x.simple_heuristics())
         return None
 
 
-    def a_star_search(self):
+    def a_star_search(self, easy = True):
         self.dfs_visited = []
         current = copy.deepcopy(self)
         frontier = [current]
         cost_so_far = {current: 0}
 
         while frontier:
-            current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
+            if not easy: current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
+            else: current = min(frontier, key = lambda x: cost_so_far[x] + x.simple_heuristics()) 
+                
 
             if current.board.check_game_over():
                 return getPath(current.board, [])
@@ -206,25 +222,10 @@ class Game:
             
             frontier.remove(current)
 
-        print("Impossible")
+        print("Impossible puzzle!")
         return []
 
    
-
-
-# def heuristics(self):
-#     points = 0
-#     gameStateBoard = self.board
-#     for piece in gameStateBoard.pieces:
-#         listCenters = zip(piece.destX, piece.destY)
-#         for center in listCenters:
-#             if center[0] == piece.x: points += check_obstaclesX(piece, center[0], gameStateBoard.board)
-#             if center[1] == piece.y: points += check_obstaclesX(piece, center[1], gameStateBoard.board)
-#             if center[0] != piece.x: points += 1
-#             if center[1] != piece.y: points += 1
-
-#     return points
-
 def check_obstaclesX(piece, centerX, board):
     iterMin = min(piece.x, centerX)
     iterMax = max(piece.y, centerX)
