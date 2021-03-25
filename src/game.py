@@ -2,6 +2,7 @@ from board import *
 from stats import *
 from settings import *
 import copy
+import random
 
 global gamesettings
 gamesettings = Settings(1,1,1,1,1,1)
@@ -15,13 +16,10 @@ class Game:
         self.dfs_visited = []
         self.iddfs_solution = None
         self.dfs_result = []
+        self.nodes_expanded = 0
         
     def select_board(self):
-        staticboard = Board([   [['x', 'x'],        ['o','rP'],     ['o','-'],     ['o','-'],      ['o','-']],
-                                [['bC','-'],        ['o','-'],      ['rC','-'],    ['o','-'],      ['x','x']],
-                                [['x','x'],         ['o','-'],      ['x','x'],     ['x','x'],      ['o','-']],
-                                [['x','x'],         ['o','-'],      ['o','-'],     ['o','bP'],     ['x','x']],
-                                [['o','gP'],        ['gC','-'],     ['x','x'],     ['x','x'],      ['x','x']]])
+        staticboard = Board([[['o', 'gP'], ['o', '-'], ['o', '-'], ['o', '-'], ['o', '-']], [['gC', '-'], ['x', 'x'], ['o', '-'], ['x', 'x'], ['o', '-']], [['x', 'x'], ['x', 'x'], ['o', '-'], ['o', '-'], ['o', '-']], [['o', '-'], ['o', '-'], ['o', '-'], ['x', 'x'], ['o', '-']], [['bC', '-'], ['o', '-'], ['o', '-'], ['o', 'bP'], ['x', 'x']]])
 
         staticboard2 = Board([  [['x','x'],         ['x','x'],      ['x','x'],     ['x','x'],      ['o','-'],      ['x','x']],
                                 [['x', 'x'],        ['o','rP'],     ['o','-'],     ['o','-'],      ['bC','-'],     ['x','x']],
@@ -45,7 +43,7 @@ class Game:
         elif self.settings.puzzledb == 2:
             self.board = staticboard
         elif self.settings.puzzledb == 3:
-            self.board = staticboard4
+            self.board = staticboard2
 
     def cleanstack(self):
         self.dfs_visited = []
@@ -197,16 +195,27 @@ class Game:
         return None
 
 
-    def a_star_search(self, easy = True):
+    def a_star_search(self, easy = True, limit = False):
         self.dfs_visited = []
         current = copy.deepcopy(self)
         frontier = [current]
         cost_so_far = {current: 0}
+        self.nodes_expanded = 0
+        self.stats.start_timer()
 
         while frontier:
-            if not easy: current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
-            else: current = min(frontier, key = lambda x: cost_so_far[x] + x.simple_heuristics()) 
+            self.stats.update_timer()
+
+            if self.stats.ms > 800 and limit:
+                print("FOI ALI")
+                return []
                 
+
+            if not easy: current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
+            else: current = min(frontier, key = lambda x: cost_so_far[x] + x.simple_heuristics())
+            
+            
+            self.nodes_expanded += 1
 
             if current.board.check_game_over():
                 return getPath(current.board, [])
@@ -224,6 +233,87 @@ class Game:
 
         print("Impossible puzzle!")
         return []
+
+
+
+    #   GENERATE RANDOM PUZZLES
+    
+    def generate_random_board(self):
+        empty_board = [[['o','-'],        ['o','-'],     ['o','-'],     ['o','-'],      ['o','-']],
+        [['o','-'],        ['o','-'],      ['o','-'],    ['o','-'],      ['o','-']],
+        [['o','-'],         ['o','-'],      ['o','-'],     ['o','-'],      ['o','-']],
+        [['o','-'],         ['o','-'],      ['o','-'],     ['o','-'],     ['o','-']],
+        [['o','-'],        ['o','-'],     ['o','-'],     ['o','-'],      ['o','-']]]
+
+        pieces = [['gC','gP'], ['bC','bP'], ['rC','rP'], ['yC','yP'], ['pC','pP']]
+        pieces_to_use = [pieces[x] for x in range(random.randint(2, len(pieces)))]
+
+        n_obstacles = random.randint(5,10)
+
+        possible_positions = []
+
+        for i in range(len(empty_board)):
+            possible_positions.append((0, i))
+            possible_positions.append((i, 0))
+            possible_positions.append((len(empty_board) - 1, i))
+            possible_positions.append((i, len(empty_board) - 1))
+
+        for i in range(n_obstacles):
+            (row, col) = (random.randrange(5), random.randrange(5))
+            empty_board[col][row] = ['x', 'x']
+
+        while pieces_to_use:
+            elem = pieces_to_use.pop(random.randrange(len(pieces_to_use)))
+            (row, col) = (0,0)
+
+            found = False
+            while not found:
+                (row, col) = possible_positions.pop(random.randrange(len(possible_positions)))
+                if empty_board[col][row] != ['x', 'x']:
+                    found = True
+
+            empty_board[col][row] = elem
+        
+        return empty_board
+
+    
+    
+    def generate_random_puzzle(self):
+        board = Board(self.generate_random_board())
+        self.board = board
+    
+        visited = [self.board]
+
+        for i in range(7):
+            neighbours = [x for x in self.neighbours() if x.board.board not in visited]
+            if len(neighbours) == 0:
+                #print("DEAD END")
+                return None
+
+            self.board = neighbours[random.randrange(len(neighbours))].board
+            visited.append(self.board.board)
+        
+        print(self.board.board)
+
+
+    
+    def get_possible_board(self):
+        found = False
+        while not found:
+            print("Generating board...")
+            self.iddfs_solution = None
+            self.generate_random_puzzle()
+            self.board.parentBoard = None
+            solution = self.a_star_search(False, True)
+            if solution != None and len(solution) < 4 : continue
+            elif solution != None:
+                found = True
+                print(len(solution))
+            self.cleanstack()
+
+        print("Encontrei uma board valida")
+
+        
 
    
 def check_obstaclesX(piece, centerX, board):
@@ -245,3 +335,4 @@ def getPath(board, listBoards):
         return listBoards
     listBoards.append(board)
     return getPath(board.parentBoard, listBoards)
+    
