@@ -115,7 +115,7 @@ def draw_stats_screen(gamestate):
     puzzlernd = font.render("Random Puzzle Generation: " + gamestate.settings.randomstr, True, (0,0,255), BACKGRD_COLOR)
     itlist = [title, moves, time]
     if gamestate.settings.mode == 2:
-        itfactor = 65
+        itfactor = 58
         mode = font.render("Game Mode: " + gamestate.settings.modestr, True, (0,0,255), BACKGRD_COLOR)
         search = font.render("Search Method: " + gamestate.settings.searchstr, True, (0,0,255), BACKGRD_COLOR)
         operations = font.render("Number of operations : " + str(gamestate.stats.operations) + " moves", True, (0,0,255), BACKGRD_COLOR)
@@ -123,11 +123,11 @@ def draw_stats_screen(gamestate):
         if gamestate.settings.memtrack == 2: 
             memory = font.render("Memory used: " + str(gamestate.stats.memoryused) + " memory blocks", True, (0,0,255), BACKGRD_COLOR)
             itlist += [memory]
-        itlist += [stgstitle, mode, search]
+        itlist += [stgstitle, puzzledb, puzzlernd, mode, search]
         if gamestate.settings.search in [5,6]:
             heuristic = font.render("Heuristic: " + gamestate.settings.heuristicstr, True, (0,0,255), BACKGRD_COLOR)
             itlist += [heuristic]
-        itlist += [puzzledb]
+        #itlist += [puzzledb]
     elif gamestate.settings.mode == 1:
         itfactor = 100
         itlist += [stgstitle, puzzledb, puzzlernd]

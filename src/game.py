@@ -38,12 +38,17 @@ class Game:
                                 [['o','-'],         ['o','-'],     ['o','-'],     ['o','-'],      ['o','-']],
                                 [['x','x'],         ['x','x'],      ['x','x'],     ['o','-'],     ['o','-']],
                                 [['o','-'],        ['x','x'],     ['x','x'],     ['o','-'],      ['o','-']]])
-        if self.settings.puzzledb == 1:
-            self.board = staticboard3
-        elif self.settings.puzzledb == 2:
-            self.board = staticboard
-        elif self.settings.puzzledb == 3:
-            self.board = staticboard2
+
+        if self.settings.randompz == 2:
+            self.get_possible_board()
+            self.board.parentBoard = None
+        else:
+            if self.settings.puzzledb == 1:
+                self.board = staticboard3
+            elif self.settings.puzzledb == 2:
+                self.board = staticboard2
+            elif self.settings.puzzledb == 3:
+                self.board = staticboard4
 
     def cleanstack(self):
         self.dfs_visited = []
@@ -303,15 +308,15 @@ class Game:
             print("Generating board...")
             self.iddfs_solution = None
             self.generate_random_puzzle()
-            self.board.parentBoard = None
+            #self.board.parentBoard = None
             solution = self.a_star_search(False, True)
             if solution != None and len(solution) < 4 : continue
             elif solution != None:
                 found = True
-                print(len(solution))
-            self.cleanstack()
+                self.cleanstack()
 
         print("Encontrei uma board valida")
+        #self.board = self.genboard
 
         
 

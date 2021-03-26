@@ -95,8 +95,7 @@ def ai_loop(GameState):
         elif GameState.settings.heuristic == 2:
             if GameState.settings.memtrack == 2:
                 tracemalloc.start()
-            GameState.get_possible_board()
-            GameState.board.parentBoard = None
+            
             pathlist = GameState.a_star_search()
 
             if GameState.settings.memtrack == 2:

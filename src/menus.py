@@ -10,11 +10,15 @@ def set_mode(value, mode):
         main_menu.remove_widget(quitbtn)
         main_menu.add.generic_widget(memorybtn)
         main_menu.add.generic_widget(searchbtn)
+        if gamesettings.search in [4,5]:
+            main_menu.add.generic_widget(heuristicbtn)
         main_menu.add.generic_widget(quitbtn)
     elif(mode == 1):
         main_menu.remove_widget(quitbtn)
         main_menu.remove_widget(memorybtn)
         main_menu.remove_widget(searchbtn)
+        if gamesettings.search in [4,5]:
+            main_menu.remove_widget(heuristicbtn)
         main_menu.add.generic_widget(quitbtn)
 
 def set_search(value, mode):
@@ -38,7 +42,7 @@ def set_puzzle_selection(value, mode):
     gamesettings.updatestrs()
 
 def set_random_puzzle(value, mode):
-    gamesettings.random = mode
+    gamesettings.randompz = mode
     gamesettings.updatestrs()
 
 def set_memtrack(value, mode):
