@@ -2,6 +2,7 @@ from board import *
 from stats import *
 from settings import *
 import copy
+import itertools
 import random
 
 global gamesettings
@@ -144,24 +145,25 @@ class Game:
 
 
 
-    def heuristics(self):
-        points = 0
-        gameStateBoard = self.board
-        for piece in gameStateBoard.pieces:
-            listCenters = zip(piece.destX, piece.destY)
-            for center in listCenters:
-                if center[0] == piece.x: points += check_obstaclesX(piece, center[0], gameStateBoard.board)
-                if center[1] == piece.y: points += check_obstaclesX(piece, center[1], gameStateBoard.board)
-                if center[0] != piece.x: points += 1
-                if center[1] != piece.y: points += 1
+    # def heuristics(self):
+    #     points = 0
+    #     gameStateBoard = self.board
+    #     for piece in gameStateBoard.pieces:
+    #         listCenters = zip(piece.destX, piece.destY)
+    #         for center in listCenters:
+    #             if center[0] == piece.x: points += check_obstaclesX(piece, center[0], gameStateBoard.board)
+    #             if center[1] == piece.y: points += check_obstaclesX(piece, center[1], gameStateBoard.board)
+    #             if center[0] != piece.x: points += 1
+    #             if center[1] != piece.y: points += 1
         
-        return points
+    #     return points
 
     # def heuristics(self):
     #     points = 0
     #     gameStateBoard = self.board
-    #     points_list = []
+    #     piece_eval = []
     #     for piece in gameStateBoard.pieces:
+    #         points_list = []
     #         listCenters = zip(piece.destX, piece.destY)
     #         for center in listCenters:
     #             pointsAux = 0
@@ -170,10 +172,51 @@ class Game:
     #             if center[0] != piece.x: pointsAux += 1
     #             if center[1] != piece.y: pointsAux += 1
     #             points_list.append(pointsAux)
-    #         points += min(points_list)
+    #         piece_eval.append(points_list)
         
+
     #     return points
 
+    def group_pieces(self): #GROUP PIECES BY COLOR
+        piecesDict = {}
+        for piece in self.board.pieces:
+            if piece.color not in piecesDict.keys():
+                piecesDict[piece.color] = [piece]
+            else:
+                listPieces = piecesDict[piece.color]
+                listPieces.append(piece)
+                piecesDict[piece.color] = listPieces
+        
+        return [x for x in piecesDict.values()]
+
+
+
+
+    def heuristics(self):
+        points = 0
+        gameStateBoard = self.board
+        listPieces = self.group_pieces()
+        
+
+        for pieces in listPieces:
+            points_list = []
+            list_centers = list(zip(pieces[0].destX, pieces[0].destY))
+            permutations = [list(zip(x,list_centers)) for x in itertools.permutations(pieces,len(list_centers))]
+            for permutation in permutations:
+                pointsAux = 0
+                for piece, center in permutation:
+                    if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
+                    if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
+                    if center[0] != piece.x: pointsAux += 1
+                    if center[1] != piece.y: pointsAux += 1
+                points_list.append(pointsAux)
+
+            points += min(points_list)
+
+        return points
+
+
+        
 
 
     def greedy_search(self, easy = False):
@@ -218,6 +261,8 @@ class Game:
 
             if not easy: current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
             else: current = min(frontier, key = lambda x: cost_so_far[x] + x.simple_heuristics())
+
+            print(cost_so_far[current], current.heuristics())
             
             
             self.nodes_expanded += 1
@@ -320,7 +365,17 @@ class Game:
 
         
 
-   
+
+
+
+# def getStackedPieces(pieces, board):
+#     for piece in pieces:
+#         for secondPiece in pieces:
+#             if piece is not secondPiece and piece
+
+        
+
+
 def check_obstaclesX(piece, centerX, board):
     iterMin = min(piece.x, centerX)
     iterMax = max(piece.y, centerX)
