@@ -143,39 +143,9 @@ class Game:
         
         return points
 
+    
+    
 
-
-    # def heuristics(self):
-    #     points = 0
-    #     gameStateBoard = self.board
-    #     for piece in gameStateBoard.pieces:
-    #         listCenters = zip(piece.destX, piece.destY)
-    #         for center in listCenters:
-    #             if center[0] == piece.x: points += check_obstaclesX(piece, center[0], gameStateBoard.board)
-    #             if center[1] == piece.y: points += check_obstaclesX(piece, center[1], gameStateBoard.board)
-    #             if center[0] != piece.x: points += 1
-    #             if center[1] != piece.y: points += 1
-        
-    #     return points
-
-    # def heuristics(self):
-    #     points = 0
-    #     gameStateBoard = self.board
-    #     piece_eval = []
-    #     for piece in gameStateBoard.pieces:
-    #         points_list = []
-    #         listCenters = zip(piece.destX, piece.destY)
-    #         for center in listCenters:
-    #             pointsAux = 0
-    #             if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
-    #             if center[1] == piece.y: pointsAux += check_obstaclesX(piece, center[1], gameStateBoard.board)
-    #             if center[0] != piece.x: pointsAux += 1
-    #             if center[1] != piece.y: pointsAux += 1
-    #             points_list.append(pointsAux)
-    #         piece_eval.append(points_list)
-        
-
-    #     return points
 
     def group_pieces(self): #GROUP PIECES BY COLOR
         piecesDict = {}
@@ -196,11 +166,11 @@ class Game:
         points = 0
         gameStateBoard = self.board
         listPieces = self.group_pieces()
-        points += evaluatePieceStacks(gameStateBoard)
+        points += evaluatePieceStacks(gameStateBoard) * 2
         for pieces in listPieces:
             points_list = []
             list_centers = list(zip(pieces[0].destX, pieces[0].destY))
-            permutations = [list(zip(x,list_centers)) for x in itertools.permutations(pieces,len(list_centers))]
+            permutations = [list(zip(x,list_centers)) for x in itertools.permutations(pieces,len(list_centers))] #  *Finds best combination between pieces and respective centers*
             for permutation in permutations:
                 pointsAux = 0
                 for piece, center in permutation:
@@ -254,7 +224,6 @@ class Game:
             self.stats.update_timer()
 
             if self.stats.ms > 800 and limit:
-                #print("FOI ALI")
                 return []
                 
 
@@ -426,7 +395,6 @@ def getStackedPieces(pieces):
     stacked_x = 0
     stacked_y = 0
 
-    # print((x_coords, y_coords))
     sorted_x_coords = sorted(x_coords)
     sorted_y_coords = sorted(y_coords)
 
