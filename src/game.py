@@ -196,8 +196,7 @@ class Game:
         points = 0
         gameStateBoard = self.board
         listPieces = self.group_pieces()
-        
-
+        points += evaluatePieceStacks(gameStateBoard)
         for pieces in listPieces:
             points_list = []
             list_centers = list(zip(pieces[0].destX, pieces[0].destY))
@@ -255,15 +254,14 @@ class Game:
             self.stats.update_timer()
 
             if self.stats.ms > 800 and limit:
-                print("FOI ALI")
+                #print("FOI ALI")
                 return []
                 
 
             if not easy: current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
             else: current = min(frontier, key = lambda x: cost_so_far[x] + x.simple_heuristics())
 
-            print(cost_so_far[current], current.heuristics())
-            
+           
             
             self.nodes_expanded += 1
 
@@ -337,7 +335,6 @@ class Game:
         for i in range(7):
             neighbours = [x for x in self.neighbours() if x.board.board not in visited]
             if len(neighbours) == 0:
-                #print("DEAD END")
                 return None
 
             self.board = neighbours[random.randrange(len(neighbours))].board
@@ -353,7 +350,6 @@ class Game:
             print("Generating board...")
             self.iddfs_solution = None
             self.generate_random_puzzle()
-            #self.board.parentBoard = None
             solution = self.a_star_search(False, True)
             if solution != None and len(solution) < 4 : continue
             elif solution != None:
@@ -368,12 +364,107 @@ class Game:
 
 
 
-# def getStackedPieces(pieces, board):
-#     for piece in pieces:
-#         for secondPiece in pieces:
-#             if piece is not secondPiece and piece
+    # def getStackedPieces(self):
+    #     pieces = self.board.pieces
+    #     board =  self.board
+    #     result = 0
+    #     pieces_dict_x = {} #{x=1: [piece1, piece2,...]}
+    #     pieces_dict_y = {} #{y=1: [piece1, piece2,...]}
 
+    #     for piece in pieces:
+    #         if piece.x not in pieces_dict_x:
+    #             pieces_dict_x[piece.x] = [piece]
+            
+    #         else:
+    #             list_pieces = pieces_dict_x[piece.x]
+    #             list_pieces.append(piece)
+    #             pieces_dict_x[piece.x] = list_pieces
+
+    #     for piece in pieces:
+    #         if piece.y not in pieces_dict_y:
+    #             pieces_dict_y[piece.y] = [piece]
+            
+    #         else:
+    #             list_pieces = pieces_dict_y[piece.y]
+    #             list_pieces.append(piece)
+    #             pieces_dict_y[piece.y] = list_pieces
+
+    #     num_stacked_x = 0
+    #     for list_pieces in pieces_dict_x.values():
+    #         sorted_pieces_x = sorted(list_pieces, key = lambda x: x.y)
+    #         current = -2
+    #         for piece in sorted_pieces_x:
+    #             if piece.y == current + 1:
+    #                 num_stacked_x += 1
+    #             current = piece.y
+
+    #     num_stacked_y = 0
+    #     for list_pieces in pieces_dict_y.values():
+    #         sorted_pieces_y = sorted(list_pieces, key = lambda x: x.x)
+    #         current = -2
+    #         for piece in sorted_pieces_y:
+    #             if piece.x == current + 1:
+    #                 num_stacked_y += 1
+    #             current = piece.x
+
+    #     print(num_stacked_x, num_stacked_y)
+    #     return result
+
+def evaluatePieceStacks(board):
+    result = sum([abs(x-y) for (x,y) in zip(getStackedPieces(board.pieces), getStackedCenters(board.centers))])
+    return result
+
+
+
+def getStackedPieces(pieces):
+    
+    x_coords = []
+    y_coords = []
+    for piece in pieces:
+        x_coords.append(piece.x)
+        y_coords.append(piece.y)
+    stacked_x = 0
+    stacked_y = 0
+
+    # print((x_coords, y_coords))
+    sorted_x_coords = sorted(x_coords)
+    sorted_y_coords = sorted(y_coords)
+
+    for x in range(len(x_coords[1:])):
+        if sorted_x_coords[x] + 1  == sorted_x_coords[x-1]:
+            stacked_x += 1
+
+    for y in range(len(y_coords[1:])):
+        if sorted_y_coords[y] + 1 == sorted_y_coords[y-1]:
+            stacked_y += 1
+
+    return [stacked_x, stacked_y]
         
+
+def getStackedCenters(centers):
+    
+    x_coords = []
+    y_coords = []
+    for center in centers:
+        x_coords.append(center.x)
+        y_coords.append(center.y)
+
+    sorted_x_coords = sorted(x_coords)
+    sorted_y_coords = sorted(y_coords)
+
+    stacked_x = 0
+    stacked_y = 0
+
+    for x in range(len(x_coords[1:])):
+        if sorted_x_coords[x] + 1 == sorted_x_coords[x-1]:
+            stacked_x += 1
+
+    for y in range(len(y_coords[1:])):
+        if sorted_y_coords[y] + 1 == sorted_y_coords[y-1]:
+            stacked_y += 1
+
+    return [stacked_x, stacked_y]
+    
 
 
 def check_obstaclesX(piece, centerX, board):
