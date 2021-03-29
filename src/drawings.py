@@ -118,13 +118,13 @@ def draw_stats_screen(gamestate):
         itfactor = 58
         mode = font.render("Game Mode: " + gamestate.settings.modestr, True, (0,0,255), BACKGRD_COLOR)
         search = font.render("Search Method: " + gamestate.settings.searchstr, True, (0,0,255), BACKGRD_COLOR)
-        operations = font.render("Number of operations : " + str(gamestate.stats.operations) + " moves", True, (0,0,255), BACKGRD_COLOR)
+        operations = font.render("Number of operations : " + str(gamestate.stats.operations) + " boards", True, (0,0,255), BACKGRD_COLOR)
         itlist += [operations]
         if gamestate.settings.memtrack == 2: 
             memory = font.render("Memory used: " + str(gamestate.stats.memoryused) + " memory blocks", True, (0,0,255), BACKGRD_COLOR)
             itlist += [memory]
         itlist += [stgstitle, puzzledb, puzzlernd, mode, search]
-        if gamestate.settings.search in [5,6]:
+        if gamestate.settings.search in [4,5]:
             heuristic = font.render("Heuristic: " + gamestate.settings.heuristicstr, True, (0,0,255), BACKGRD_COLOR)
             itlist += [heuristic]
         #itlist += [puzzledb]
@@ -146,10 +146,11 @@ def draw_stats_screen(gamestate):
     pygame.display.update()
 
 def draw_replay(pathlist, timestr):
+    #draw_replay_stats(timestr, 0)
     for i in range(len(pathlist)):
         pygame.event.pump()
         SCREEN.fill(BACKGRD_COLOR)
-        draw_replay_stats(timestr, i)
         draw_board(pathlist[-(i+1)].board)
+        draw_replay_stats(timestr, i+1)
         pygame.display.update()
         pygame.time.wait(500)

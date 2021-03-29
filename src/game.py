@@ -199,6 +199,7 @@ class Game:
                 return getPath(current_node.board, [])
            
             neighbours = [x for x in current_node.neighbours() if x.board.board not in self.dfs_visited]
+            self.stats.operations+=len(neighbours)
 
             if len(neighbours) == 0:
                 self.dfs_visited.append(current_node.board.board)
@@ -238,6 +239,7 @@ class Game:
                 return getPath(current.board, [])
 
             neighbours = [x for x in current.neighbours() if x not in self.dfs_visited]
+            self.stats.operations += len(neighbours)
 
             for next in neighbours:
                 self.dfs_visited.append(next)

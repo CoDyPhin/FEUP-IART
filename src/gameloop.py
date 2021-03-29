@@ -39,7 +39,7 @@ def ai_loop(GameState):
             GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
             tracemalloc.stop()
         pathlist = GameState.dfs_result
-        GameState.stats.moves = len(pathlist) - 1
+        #GameState.stats.moves = len(pathlist) - 1
         GameState.cleanstack()
 
     elif GameState.settings.search == 3:
@@ -49,7 +49,7 @@ def ai_loop(GameState):
         if GameState.settings.memtrack == 2:
             GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
             tracemalloc.stop()
-        GameState.stats.moves = len(pathlist) - 1
+        #GameState.stats.moves = len(pathlist) - 1
         GameState.cleanstack()
 
     elif GameState.settings.search == 4:
@@ -62,7 +62,7 @@ def ai_loop(GameState):
                 GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
                 tracemalloc.stop()
                 
-            GameState.stats.moves = len(pathlist)
+            #GameState.stats.moves = len(pathlist)
             GameState.cleanstack()
        
         elif GameState.settings.heuristic == 2:
@@ -75,7 +75,7 @@ def ai_loop(GameState):
                 GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
                 tracemalloc.stop()
                 
-            GameState.stats.moves = len(pathlist)
+            #GameState.stats.moves = len(pathlist)
             GameState.cleanstack()
 
 
@@ -90,7 +90,7 @@ def ai_loop(GameState):
                 GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
                 tracemalloc.stop()
             
-            GameState.stats.moves = len(pathlist)
+            #GameState.stats.moves = len(pathlist)
             GameState.cleanstack()
         elif GameState.settings.heuristic == 2:
             if GameState.settings.memtrack == 2:
@@ -102,10 +102,12 @@ def ai_loop(GameState):
                 GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
                 tracemalloc.stop()
             
-            GameState.stats.moves = len(pathlist)
             GameState.cleanstack()
 
+    if(pathlist[-1].parentBoard == None):
+        pathlist.remove(pathlist[-1])
     
+    GameState.stats.moves = len(pathlist)
     if(len(pathlist) != 0):
         GameState.board = pathlist[0]
         GameState.stats.update_timer()
