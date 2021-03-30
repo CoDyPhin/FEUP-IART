@@ -1,4 +1,4 @@
-from board import *
+from database import *
 from stats import *
 from settings import *
 import copy
@@ -20,36 +20,16 @@ class Game:
         self.nodes_expanded = 0
         
     def select_board(self):
-        staticboard = Board([[['o', 'gP'], ['o', '-'], ['o', '-'], ['o', '-'], ['o', '-']], [['gC', '-'], ['x', 'x'], ['o', '-'], ['x', 'x'], ['o', '-']], [['x', 'x'], ['x', 'x'], ['o', '-'], ['o', '-'], ['o', '-']], [['o', '-'], ['o', '-'], ['o', '-'], ['x', 'x'], ['o', '-']], [['bC', '-'], ['o', '-'], ['o', '-'], ['o', 'bP'], ['x', 'x']]])
-
-        staticboard2 = Board([  [['x','x'],         ['x','x'],      ['x','x'],     ['x','x'],      ['o','-'],      ['x','x']],
-                                [['x', 'x'],        ['o','rP'],     ['o','-'],     ['o','-'],      ['bC','-'],     ['x','x']],
-                                [['o','-'],         ['o','-'],      ['rC','-'],    ['o','-'],      ['x','x'],      ['x','x']],
-                                [['x','x'],         ['o','-'],      ['x','x'],     ['x','x'],      ['o','-'],      ['x','x']],
-                                [['x','x'],         ['o','-'],      ['o','-'],     ['o','bP'],     ['x','x'],      ['x','x']],
-                                [['o','gP'],        ['gC','-'],     ['x','x'],     ['x','x'],      ['x','x'],      ['x','x']]])
-
-        staticboard3 = Board([  [['x', 'x'],        ['o','rP'],     ['o','-'],     ['o','-']],
-                                [['bC','-'],        ['o','-'],      ['rC','-'],    ['o','bP']],
-                                [['x','x'],         ['o','-'],      ['x','x'],     ['x','x']],
-                                [['o','gP'],        ['gC','-'],     ['x','x'],     ['x','x']]])
-
-        staticboard4 = Board([   [['o', 'bP'],        ['x','x'],     ['bC','-'],     ['o','-'],      ['o','bP']],
-                                [['bC','-'],        ['o','-'],      ['o','-'],      ['o','-'],      ['x','x']],
-                                [['o','-'],         ['o','-'],     ['o','-'],     ['o','-'],      ['o','-']],
-                                [['x','x'],         ['x','x'],      ['x','x'],     ['o','-'],     ['o','-']],
-                                [['o','-'],        ['x','x'],     ['x','x'],     ['o','-'],      ['o','-']]])
-
         if self.settings.randompz == 2:
             self.get_possible_board()
             self.board.parentBoard = None
         else:
             if self.settings.puzzledb == 1:
-                self.board = staticboard3
+                self.board = copy.deepcopy(easy_db[random.randint(0,len(easy_db)-1)])
             elif self.settings.puzzledb == 2:
-                self.board = staticboard2
+                self.board = copy.deepcopy(medium_db[random.randint(0,len(medium_db)-1)])
             elif self.settings.puzzledb == 3:
-                self.board = staticboard4
+                self.board = copy.deepcopy(hard_db[random.randint(0,len(hard_db)-1)])
 
     def cleanstack(self):
         self.dfs_visited = []
@@ -166,7 +146,7 @@ class Game:
         points = 0
         gameStateBoard = self.board
         listPieces = self.group_pieces()
-        points += evaluatePieceStacks(gameStateBoard) * 2
+        #points += evaluatePieceStacks(gameStateBoard) * 2
         for pieces in listPieces:
             points_list = []
             list_centers = list(zip(pieces[0].destX, pieces[0].destY))
@@ -197,7 +177,7 @@ class Game:
             
             if current_node.board.check_game_over():
                 return getPath(current_node.board, [])
-           
+            
             neighbours = [x for x in current_node.neighbours() if x.board.board not in self.dfs_visited]
             self.stats.operations+=len(neighbours)
 
@@ -253,7 +233,41 @@ class Game:
         print("Impossible puzzle!")
         return []
 
+    def get_hint(self):
+        self.dfs_visited = []
+        current = copy.deepcopy(self)
+        frontier = [current]
+        cost_so_far = {current: 0}
+        self.nodes_expanded = 0
+        #self.stats.start_timer()
 
+        while frontier:
+            current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
+            self.nodes_expanded += 1
+            if current.board.check_game_over():
+                solution = getPath(current.board, [])
+                #print(solution)
+                solution.reverse()
+                #print(solution)
+                return solution
+
+            neighbours = [copy.deepcopy(current) for i in range(4)]
+            neighbour_boards = [neighbours[0].board.setParentBoard(current.board).setMove("up").move_up(), neighbours[1].board.setParentBoard(current.board).setMove("down").move_down(), neighbours[2].board.setParentBoard(current.board).setMove("left").move_left(), neighbours[3].board.setParentBoard(current.board).setMove("right").move_right()]
+            neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
+            neighbours = [x for x in neighbours if x not in self.dfs_visited]
+            #self.stats.operations += len(neighbours)
+            #print([i.board.move for i in neighbours])
+            for next in neighbours:
+                self.dfs_visited.append(next)
+                new_cost = cost_so_far[current] + 1
+                if next not in cost_so_far or new_cost < cost_so_far[next]:
+                    cost_so_far[next] = new_cost
+                    frontier.append(next)
+            
+            frontier.remove(current)
+
+        print("Impossible puzzle!")
+        return []
 
     #   GENERATE RANDOM PUZZLES
     

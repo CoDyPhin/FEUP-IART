@@ -62,7 +62,12 @@ def draw_stats(stats, receivedhint):
     hintRect.topleft = (5, 200)
     SCREEN.blit(hint, hintRect)
     if(receivedhint != "None"):
-        rec_hint = font.render("Try moving " + receivedhint + "!", True, (0,0,139), (192,192,192))
+        if(receivedhint == "Calculating..."):
+            rec_hint = font.render(receivedhint, True, (0,0,139), (192,192,192))
+        elif (receivedhint == "Impossible"):
+            rec_hint = font.render("Impossible, ESC to reset", True, (0,0,139), (192,192,192))
+        else:
+            rec_hint = font.render("Try moving " + receivedhint + "!", True, (0,0,139), (192,192,192))
         rec_hintRect = rec_hint.get_rect()
         rec_hintRect.topleft = (5,250)
         SCREEN.blit(rec_hint, rec_hintRect)
@@ -151,6 +156,8 @@ def draw_replay(pathlist, timestr):
         pygame.event.pump()
         SCREEN.fill(BACKGRD_COLOR)
         draw_board(pathlist[-(i+1)].board)
+        #for j in range(len(pathlist[-(i+1)].pieces)):
+        #    print("Piece " + str(j) + ": " + str((pathlist[-(i+1)].pieces[j].x, pathlist[-(i+1)].pieces[j].y)))
         draw_replay_stats(timestr, i+1)
         pygame.display.update()
         pygame.time.wait(500)

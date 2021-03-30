@@ -118,13 +118,27 @@ def player_loop(GameState):
     previouskey = "None"
     hint = "None"
     running = True
+    notfound = True
+    solution = []
     GameState.stats.start_timer()
     while running:
         gameover = GameState.board.check_game_over()
         GameState.stats.update_timer()
         if gameover: break
         if(pygame.key.get_pressed()[pygame.K_h]):
-            hint = "Not yet implemented" #get_hint(GameState.settings): (...) return up; down; right; left
+            for i in range(len(solution)):
+                if GameState.board.board == solution[i].board:
+                    hint = solution[i+1].move
+                    notfound = False
+            if(notfound):
+                draw_screen(GameState, "Calculating...")
+                solution = GameState.get_hint()
+                GameState.cleanstack()
+                if solution == []:
+                    hint = "Impossible"
+                else:
+                    hint = solution[0].move
+            notfound = True
         draw_screen(GameState, hint)
         previouskey2 = handle_movement(GameState, previouskey)
         if(previouskey2 != previouskey): hint = "None"

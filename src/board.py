@@ -9,9 +9,14 @@ class Board:
         self.retrieveCenters()
         self.retrievePieces()
         self.parentBoard = None  # trace path using search algorithms
+        self.move = None # hint tracing
 
     def setParentBoard(self, board):
         self.parentBoard = board
+        return self
+
+    def setMove(self,move):
+        self.move = move
         return self
 
     def retrieveCenters(self):
