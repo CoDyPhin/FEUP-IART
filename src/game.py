@@ -20,12 +20,21 @@ class Game:
         self.nodes_expanded = 0
         
     def select_board(self):
+        staticBoard = Board([
+        [['x','x'],        ['o','-'],     ['o','rP'],     ['o','-'],   ['o','-'],   ['x','x']],
+        [['o','-'],        ['o','bP'],      ['o','-'],   ['o','-'],     ['o','-'],   ['bC','-']],
+        [['o','gP'],         ['gC','-'],      ['x','x'],     ['o','-'],   ['o','-'],   ['o','-']],
+        [['rC','-'],        ['x', 'x'],    ['o','-'],     ['o','-'],   ['o','-'],   ['x','x']],
+        [['o','-'],         ['o','-'],      ['x','x'],     ['o','-'],   ['o','-'],   ['x','x']],
+        [['o','-'],       ['o','-'],     ['x','x'],    ['x','x'],     ['o','-'],   ['x','x']]
+
+    ])
         if self.settings.randompz == 2:
             self.get_possible_board()
             self.board.parentBoard = None
         else:
             if self.settings.puzzledb == 1:
-                self.board = copy.deepcopy(easy_db[random.randint(0,len(easy_db)-1)])
+                self.board = staticBoard
             elif self.settings.puzzledb == 2:
                 self.board = copy.deepcopy(medium_db[random.randint(0,len(medium_db)-1)])
             elif self.settings.puzzledb == 3:
@@ -146,7 +155,7 @@ class Game:
         points = 0
         gameStateBoard = self.board
         listPieces = self.group_pieces()
-        #points += evaluatePieceStacks(gameStateBoard) * 2
+        #points += evaluatePieceStacks(gameStateBoard)
         for pieces in listPieces:
             points_list = []
             list_centers = list(zip(pieces[0].destX, pieces[0].destY))
@@ -156,8 +165,7 @@ class Game:
                 for piece, center in permutation:
                     if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
                     if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
-                    if center[0] != piece.x: pointsAux += 1
-                    if center[1] != piece.y: pointsAux += 1
+                    pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
                 points_list.append(pointsAux)
 
             points += min(points_list)
@@ -341,59 +349,41 @@ class Game:
                 found = True
                 self.cleanstack()
 
-        print("Encontrei uma board valida")
+        # print("Encontrei uma board valida")
         #self.board = self.genboard
 
+
+def estimateCenterDifference(piece, center, board):
+    points = 0
+    if center[0] != piece.x:
+        if center[0] == 0 or center[0] == len(board[0]) - 1:
+            points += 1
         
+        elif center[0] > 0 and board[piece.y][center[0] - 1][0] == "block" and piece.y > center[0]:
+            points += 1
 
+        elif center[0] < len(board[0]) - 1 and board[piece.y][center[0] + 1][0] == "block" and piece.y < center[0]:
+            points += 1
+        
+        else: 
+            points += 2
 
+    if center[1] != piece.y:
 
+        if center[1] == 0 or center[1] == len(board[0]) - 1:
+            points += 1
 
-    # def getStackedPieces(self):
-    #     pieces = self.board.pieces
-    #     board =  self.board
-    #     result = 0
-    #     pieces_dict_x = {} #{x=1: [piece1, piece2,...]}
-    #     pieces_dict_y = {} #{y=1: [piece1, piece2,...]}
+        elif center[1] > 0 and board[center[1] - 1][piece.x][0] == "block" and piece.x > center[1]:
+            points += 1
 
-    #     for piece in pieces:
-    #         if piece.x not in pieces_dict_x:
-    #             pieces_dict_x[piece.x] = [piece]
-            
-    #         else:
-    #             list_pieces = pieces_dict_x[piece.x]
-    #             list_pieces.append(piece)
-    #             pieces_dict_x[piece.x] = list_pieces
+        elif center[1] < len(board[0]) - 1 and board[center[1] + 1][piece.x][0] == "block" and piece.x < center[1]:
+            points += 1
+        
+        else: 
+            points += 2
+      
+    return points
 
-    #     for piece in pieces:
-    #         if piece.y not in pieces_dict_y:
-    #             pieces_dict_y[piece.y] = [piece]
-            
-    #         else:
-    #             list_pieces = pieces_dict_y[piece.y]
-    #             list_pieces.append(piece)
-    #             pieces_dict_y[piece.y] = list_pieces
-
-    #     num_stacked_x = 0
-    #     for list_pieces in pieces_dict_x.values():
-    #         sorted_pieces_x = sorted(list_pieces, key = lambda x: x.y)
-    #         current = -2
-    #         for piece in sorted_pieces_x:
-    #             if piece.y == current + 1:
-    #                 num_stacked_x += 1
-    #             current = piece.y
-
-    #     num_stacked_y = 0
-    #     for list_pieces in pieces_dict_y.values():
-    #         sorted_pieces_y = sorted(list_pieces, key = lambda x: x.x)
-    #         current = -2
-    #         for piece in sorted_pieces_y:
-    #             if piece.x == current + 1:
-    #                 num_stacked_y += 1
-    #             current = piece.x
-
-    #     print(num_stacked_x, num_stacked_y)
-    #     return result
 
 def evaluatePieceStacks(board):
     result = sum([abs(x-y) for (x,y) in zip(getStackedPieces(board.pieces), getStackedCenters(board.centers))])
@@ -455,14 +445,14 @@ def check_obstaclesX(piece, centerX, board):
     iterMin = min(piece.x, centerX)
     iterMax = max(piece.y, centerX)
     for i in range(iterMin, iterMax):
-        if board[piece.y][i][0] == "block":  return 2
+        if board[piece.y][i][0] == "block":  return 3
     return 0
 
 def check_obstaclesY(piece, centerY, board):
     iterMin = min(piece.y, centerY)
     iterMax = max(piece.y, centerY)
     for i in range(iterMin, iterMax):
-        if board[i][piece.x][0] == "block": return 2
+        if board[i][piece.x][0] == "block": return 3
     return 0
 
 def getPath(board, listBoards):
