@@ -18,6 +18,8 @@ class Game:
         self.iddfs_solution = None
         self.dfs_result = []
         self.nodes_expanded = 0
+        self.grouped_pieces = self.group_pieces()
+        self.permutations = self.get_permutations()
         
     def select_board(self):
         staticBoard = Board([
@@ -34,11 +36,19 @@ class Game:
             self.board.parentBoard = None
         else:
             if self.settings.puzzledb == 1:
-                self.board = staticBoard
+                self.board = copy.deepcopy(easy_db[random.randint(0,len(easy_db)-1)])
             elif self.settings.puzzledb == 2:
                 self.board = copy.deepcopy(medium_db[random.randint(0,len(medium_db)-1)])
             elif self.settings.puzzledb == 3:
                 self.board = copy.deepcopy(hard_db[random.randint(0,len(hard_db)-1)])
+
+    def get_permutations(self):
+        permutations_dict = {}
+        for pieces in self.grouped_pieces:
+            list_centers = list(zip(pieces[0].destX, pieces[0].destY))
+            permutations = [list(zip(x,list_centers)) for x in itertools.permutations(pieces,len(list_centers))]
+            permutations_dict[tuple(pieces)] = permutations
+        return permutations_dict
 
     def cleanstack(self):
         self.dfs_visited = []
@@ -120,15 +130,17 @@ class Game:
 
 
     
-
+    #*Counts pieces that are already above their center
     def simple_heuristics(self):
         points = 0
         gameStateBoard = self.board
         for piece in gameStateBoard.pieces:
             listCenters = zip(piece.destX, piece.destY)
             for center in listCenters:
-                if center[0] != piece.x: points += 1
-                if center[1] != piece.y: points += 1
+                # if center[0] != piece.x: points += 1
+                # if center[1] != piece.y: points += 1
+                if center[0] != piece.x and center[1] != piece.y:
+                    points += 1
         
         return points
 
@@ -154,12 +166,10 @@ class Game:
     def heuristics(self):
         points = 0
         gameStateBoard = self.board
-        listPieces = self.group_pieces()
-        #points += evaluatePieceStacks(gameStateBoard)
-        for pieces in listPieces:
+        piece_points = []
+        for pieces in self.grouped_pieces:
             points_list = []
-            list_centers = list(zip(pieces[0].destX, pieces[0].destY))
-            permutations = [list(zip(x,list_centers)) for x in itertools.permutations(pieces,len(list_centers))] #  *Finds best combination between pieces and respective centers*
+            permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
             for permutation in permutations:
                 pointsAux = 0
                 for piece, center in permutation:
@@ -167,10 +177,33 @@ class Game:
                     if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
                     pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
                 points_list.append(pointsAux)
-
+            
+            piece_points.append(min(points_list))
             points += min(points_list)
 
-        return points
+        return max(piece_points) #*evaluates only the worst piece (otherwise it would not be optimistic)
+
+
+        
+    def heuristics_not_admissible(self):
+        points = 0
+        gameStateBoard = self.board
+        piece_points = []
+        for pieces in self.grouped_pieces:
+            points_list = []
+            permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
+            for permutation in permutations:
+                pointsAux = 0
+                for piece, center in permutation:
+                    if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
+                    if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
+                    pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
+                points_list.append(pointsAux)
+            
+            piece_points.append(min(points_list))
+            points += min(points_list)
+
+        return points #*evaluates only the worst piece (otherwise it would not be optimistic)
 
 
         
@@ -354,35 +387,38 @@ class Game:
 
 
 def estimateCenterDifference(piece, center, board):
-    points = 0
+    pointsX = 0
+    pointsY = 0
     if center[0] != piece.x:
         if center[0] == 0 or center[0] == len(board[0]) - 1:
-            points += 1
+            pointsX += 1
         
         elif center[0] > 0 and board[piece.y][center[0] - 1][0] == "block" and piece.y > center[0]:
-            points += 1
+            pointsX += 1
 
         elif center[0] < len(board[0]) - 1 and board[piece.y][center[0] + 1][0] == "block" and piece.y < center[0]:
-            points += 1
+            pointsX += 1
         
         else: 
-            points += 2
+            pointsX += 2
 
     if center[1] != piece.y:
-
         if center[1] == 0 or center[1] == len(board[0]) - 1:
-            points += 1
+            pointsY += 1
 
         elif center[1] > 0 and board[center[1] - 1][piece.x][0] == "block" and piece.x > center[1]:
-            points += 1
+            pointsY += 1
 
         elif center[1] < len(board[0]) - 1 and board[center[1] + 1][piece.x][0] == "block" and piece.x < center[1]:
-            points += 1
+            pointsY += 1
+        
+        elif pointsX != 2: 
+            pointsY += 2
         
         else: 
-            points += 2
+            pointsY += 1
       
-    return points
+    return pointsX + pointsY
 
 
 def evaluatePieceStacks(board):
