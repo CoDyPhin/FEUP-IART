@@ -171,12 +171,14 @@ class Game:
             points_list = []
             permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
             for permutation in permutations:
-                pointsAux = 0
+                list_aux = []
                 for piece, center in permutation:
+                    pointsAux = 0
                     if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
                     if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
                     pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
-                points_list.append(pointsAux)
+                    list_aux.append(pointsAux)
+                points_list.append(max(list_aux))
             
             piece_points.append(min(points_list))
             points += min(points_list)
@@ -393,10 +395,10 @@ def estimateCenterDifference(piece, center, board):
         if center[0] == 0 or center[0] == len(board[0]) - 1:
             pointsX += 1
         
-        elif center[0] > 0 and board[piece.y][center[0] - 1][0] == "block" and piece.y > center[0]:
+        elif center[0] > 0 and board[piece.y][center[0] - 1][0] == "x" and piece.x > center[0]:
             pointsX += 1
 
-        elif center[0] < len(board[0]) - 1 and board[piece.y][center[0] + 1][0] == "block" and piece.y < center[0]:
+        elif center[0] < len(board[0]) - 1 and board[piece.y][center[0] + 1][0] == "x" and piece.x < center[0]:
             pointsX += 1
         
         else: 
@@ -406,10 +408,10 @@ def estimateCenterDifference(piece, center, board):
         if center[1] == 0 or center[1] == len(board[0]) - 1:
             pointsY += 1
 
-        elif center[1] > 0 and board[center[1] - 1][piece.x][0] == "block" and piece.x > center[1]:
+        elif center[1] > 0 and board[center[1] - 1][piece.x][0] == "x" and piece.y > center[1]:
             pointsY += 1
 
-        elif center[1] < len(board[0]) - 1 and board[center[1] + 1][piece.x][0] == "block" and piece.x < center[1]:
+        elif center[1] < len(board[0]) - 1 and board[center[1] + 1][piece.x][0] == "x" and piece.y < center[1]:
             pointsY += 1
         
         elif pointsX != 2: 
@@ -418,77 +420,22 @@ def estimateCenterDifference(piece, center, board):
         else: 
             pointsY += 1
       
+    # print((piece.x,piece.y), (center[0],center[1]),pointsX+pointsY)
     return pointsX + pointsY
 
-
-def evaluatePieceStacks(board):
-    result = sum([abs(x-y) for (x,y) in zip(getStackedPieces(board.pieces), getStackedCenters(board.centers))])
-    return result
-
-
-
-def getStackedPieces(pieces):
     
-    x_coords = []
-    y_coords = []
-    for piece in pieces:
-        x_coords.append(piece.x)
-        y_coords.append(piece.y)
-    stacked_x = 0
-    stacked_y = 0
-
-    sorted_x_coords = sorted(x_coords)
-    sorted_y_coords = sorted(y_coords)
-
-    for x in range(len(x_coords[1:])):
-        if sorted_x_coords[x] + 1  == sorted_x_coords[x-1]:
-            stacked_x += 1
-
-    for y in range(len(y_coords[1:])):
-        if sorted_y_coords[y] + 1 == sorted_y_coords[y-1]:
-            stacked_y += 1
-
-    return [stacked_x, stacked_y]
-        
-
-def getStackedCenters(centers):
-    
-    x_coords = []
-    y_coords = []
-    for center in centers:
-        x_coords.append(center.x)
-        y_coords.append(center.y)
-
-    sorted_x_coords = sorted(x_coords)
-    sorted_y_coords = sorted(y_coords)
-
-    stacked_x = 0
-    stacked_y = 0
-
-    for x in range(len(x_coords[1:])):
-        if sorted_x_coords[x] + 1 == sorted_x_coords[x-1]:
-            stacked_x += 1
-
-    for y in range(len(y_coords[1:])):
-        if sorted_y_coords[y] + 1 == sorted_y_coords[y-1]:
-            stacked_y += 1
-
-    return [stacked_x, stacked_y]
-    
-
-
 def check_obstaclesX(piece, centerX, board):
     iterMin = min(piece.x, centerX)
     iterMax = max(piece.y, centerX)
     for i in range(iterMin, iterMax):
-        if board[piece.y][i][0] == "block":  return 3
+        if board[piece.y][i][0] == "x":  return 3
     return 0
 
 def check_obstaclesY(piece, centerY, board):
     iterMin = min(piece.y, centerY)
     iterMax = max(piece.y, centerY)
     for i in range(iterMin, iterMax):
-        if board[i][piece.x][0] == "block": return 3
+        if board[i][piece.x][0] == "x": return 3
     return 0
 
 def getPath(board, listBoards):
