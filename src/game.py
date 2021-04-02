@@ -5,6 +5,8 @@ import copy
 import itertools
 import random
 
+#from drawings import *
+
 global gamesettings
 gamesettings = Settings(1,1,1,1,1,1)
 
@@ -22,21 +24,14 @@ class Game:
         self.permutations = self.get_permutations()
         
     def select_board(self):
-        staticBoard = Board([
-        [['x','x'],        ['o','-'],     ['o','rP'],     ['o','-'],   ['o','-'],   ['x','x']],
-        [['o','-'],        ['o','bP'],      ['o','-'],   ['o','-'],     ['o','-'],   ['bC','-']],
-        [['o','gP'],         ['gC','-'],      ['x','x'],     ['o','-'],   ['o','-'],   ['o','-']],
-        [['rC','-'],        ['x', 'x'],    ['o','-'],     ['o','-'],   ['o','-'],   ['x','x']],
-        [['o','-'],         ['o','-'],      ['x','x'],     ['o','-'],   ['o','-'],   ['x','x']],
-        [['o','-'],       ['o','-'],     ['x','x'],    ['x','x'],     ['o','-'],   ['x','x']]
-
-    ])
+        staticBoard = Board([[['o', '-'], ['o', '-'], ['o', '-'], ['o', '-'], ['rC', '-']], [['o', '-'], ['o', '-'], ['o', '-'], ['o', '-'], ['x', 'x']], [['gC', '-'], ['o', '-'], ['o', '-'], ['o', '-'], ['o', '-']], [['o', 'gP'], ['x', 'x'], ['x', 'x'], ['x', 'x'], ['o', 'rP']], [['x', 'x'], ['bC', 'bP'], ['o', '-'], ['o', '-'], ['o', '-']]])
         if self.settings.randompz == 2:
             self.get_possible_board()
             self.board.parentBoard = None
         else:
             if self.settings.puzzledb == 1:
-                self.board = copy.deepcopy(easy_db[random.randint(0,len(easy_db)-1)])
+                self.board = staticBoard
+                #self.board = copy.deepcopy(easy_db[random.randint(0,len(easy_db)-1)])
             elif self.settings.puzzledb == 2:
                 self.board = copy.deepcopy(medium_db[random.randint(0,len(medium_db)-1)])
             elif self.settings.puzzledb == 3:
@@ -211,21 +206,24 @@ class Game:
         
 
 
-    def greedy_search(self, easy = False):
+    def greedy_search(self, easy = False, generate = False):
         self.dfs_visited = []
         start_node = copy.deepcopy(self)
         current_node = copy.deepcopy(self)
+        starttime = datetime.now()
         while True:
             self.dfs_visited.append(current_node.board.board)
-            
             if current_node.board.check_game_over():
-                return getPath(current_node.board, [])
-            
+                solution = getPath(current_node.board, [])
+                return solution
+            timer = datetime.now()-starttime
+            if(generate and (timer.microseconds // 1000) > 500):
+                return None
             neighbours = [x for x in current_node.neighbours() if x.board.board not in self.dfs_visited]
             self.stats.operations+=len(neighbours)
 
             if len(neighbours) == 0:
-                self.dfs_visited.append(current_node.board.board)
+                #self.dfs_visited.append(current_node.board.board)
                 current_node.board = current_node.board.parentBoard #BACKTRACK
                 continue
             
@@ -247,7 +245,7 @@ class Game:
         while frontier:
             self.stats.update_timer()
 
-            if self.stats.ms > 800 and limit:
+            if self.stats.ms > 150 and limit:
                 return []
                 
 
@@ -320,11 +318,24 @@ class Game:
         [['o','-'],         ['o','-'],      ['o','-'],     ['o','-'],      ['o','-']],
         [['o','-'],         ['o','-'],      ['o','-'],     ['o','-'],     ['o','-']],
         [['o','-'],        ['o','-'],     ['o','-'],     ['o','-'],      ['o','-']]]
+        
+        factor = self.settings.puzzledb
+
+        empty_board = [[['o','-'] for i in range(3+factor)] for j in range(3+factor)]
 
         pieces = [['gC','gP'], ['bC','bP'], ['rC','rP'], ['yC','yP'], ['pC','pP']]
-        pieces_to_use = [pieces[x] for x in range(random.randint(2, len(pieces)))]
+        pieces_to_use = []
+        npieces = random.randint(factor, factor+1)
+        for i in range(npieces):
+            pieces_to_use.append(pieces[random.randint(0,4)])
 
-        n_obstacles = random.randint(5,10)
+        if factor == 1:
+            n_obstacles = random.randint(4, 10)
+        elif factor == 2:
+            n_obstacles = random.randint(6, 15)
+        elif factor == 3:
+            n_obstacles = random.randint(9, 18)
+        #n_obstacles = random.randint((3+factor)*(3+factor)-(4-factor)*5, (3+factor)*(3+factor)-(4-factor)*8)
 
         possible_positions = []
 
@@ -335,8 +346,8 @@ class Game:
             possible_positions.append((i, len(empty_board) - 1))
 
         for i in range(n_obstacles):
-            (row, col) = (random.randrange(5), random.randrange(5))
-            empty_board[col][row] = ['x', 'x']
+            (row, col) = (random.randrange(factor+3), random.randrange(factor+3))
+            empty_board[row][col] = ['x', 'x']
 
         while pieces_to_use:
             elem = pieces_to_use.pop(random.randrange(len(pieces_to_use)))
@@ -345,11 +356,10 @@ class Game:
             found = False
             while not found:
                 (row, col) = possible_positions.pop(random.randrange(len(possible_positions)))
-                if empty_board[col][row] != ['x', 'x']:
+                if empty_board[row][col] != ['x', 'x']:
                     found = True
 
-            empty_board[col][row] = elem
-        
+            empty_board[row][col] = elem
         return empty_board
 
     
@@ -357,36 +367,66 @@ class Game:
     def generate_random_puzzle(self):
         board = Board(self.generate_random_board())
         self.board = board
+        self.grouped_pieces = self.group_pieces()
+        self.permutations = self.get_permutations()
     
         visited = [self.board]
 
-        for i in range(7):
+        for i in range(random.randint(self.settings.puzzledb*5,self.settings.puzzledb*7)):
             neighbours = [x for x in self.neighbours() if x.board.board not in visited]
             if len(neighbours) == 0:
                 return None
 
             self.board = neighbours[random.randrange(len(neighbours))].board
+            #print(self.board.board)
             visited.append(self.board.board)
-        
-        print(self.board.board)
+        self.board.centers = []
+        self.board.pieces = []
+        self.board.retrieveCenters()
+        self.board.retrievePieces()
+        if(len(self.board.centers)!=len(self.board.pieces)):
+            self.generate_random_puzzle()
+        else:
+            if self.settings.puzzledb != 1:
+                piecesDict = {}
+                for piece in self.board.pieces:
+                    if piece.color not in piecesDict.keys():
+                        piecesDict[piece.color] = [piece]
+                    else:
+                        listPieces = piecesDict[piece.color]
+                        listPieces.append(piece)
+                        piecesDict[piece.color] = listPieces
+                centersDict = {}
+                for center in self.board.centers:
+                    if center.color not in centersDict.keys():
+                        centersDict[center.color] = [center]
+                    else:
+                        listCenters = centersDict[center.color]
+                        listCenters.append(center)
+                        centersDict[center.color] = listCenters
+                for key in piecesDict.keys():
+                    if len(piecesDict[key]) != len(centersDict[key]):
+                        self.generate_random_board()
+                        break
 
 
-    
+
     def get_possible_board(self):
         found = False
         while not found:
             print("Generating board...")
             self.iddfs_solution = None
             self.generate_random_puzzle()
-            solution = self.a_star_search(False, True)
-            if solution != None and len(solution) < 4 : continue
-            elif solution != None:
+            self.cleanstack()
+            solution = self.greedy_search(generate=True)
+            if solution != None and solution != []:
+                self.board = solution[-1]
+                astar = self.a_star_search(True,True)
+                if astar != [] and len(astar) < 4:
+                    continue
                 found = True
                 self.cleanstack()
-
-        # print("Encontrei uma board valida")
-        #self.board = self.genboard
-
+        return solution
 
 def estimateCenterDifference(piece, center, board):
     pointsX = 0
@@ -441,6 +481,9 @@ def check_obstaclesY(piece, centerY, board):
 def getPath(board, listBoards):
     if (board.parentBoard == None):
         return listBoards
-    listBoards.append(board)
-    return getPath(board.parentBoard, listBoards)
+    if (board.check_game_over()):
+        return getPath(board.parentBoard, [board])
+    else:
+        listBoards.append(board)
+        return getPath(board.parentBoard, listBoards)
     

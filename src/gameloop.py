@@ -26,7 +26,10 @@ def ai_loop(GameState):
     if GameState.settings.search == 1:
         if GameState.settings.memtrack == 2:
             tracemalloc.start()
-        pathlist = GameState.bfs(GameState)
+        
+        pathlist = GameState.get_possible_board()#GameState.bfs(GameState)
+        draw_board(GameState.board.board)
+        pygame.time.wait(2500)
         if GameState.settings.memtrack == 2:
             GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
             tracemalloc.stop()
