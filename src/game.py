@@ -158,25 +158,25 @@ class Game:
 
 
 
-    # def admissible_heuristics(self):
-    #     gameStateBoard = self.board
-    #     piece_points = []
-    #     for pieces in self.grouped_pieces:
-    #         points_list = []
-    #         permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
-    #         for permutation in permutations:
-    #             list_aux = []
-    #             for piece, center in permutation:
-    #                 pointsAux = 0
-    # #                 if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
-    # #                 if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
-    #                 pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
-    #                 list_aux.append(pointsAux)
-    #             points_list.append(max(list_aux))
-            
-    #         piece_points.append(min(points_list))
+    def admissible_heuristics(self):
+        gameStateBoard = self.board
+        piece_points = []
+        for pieces in self.grouped_pieces:
+            points_list = []
+            permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
+            for permutation in permutations:
+                list_aux = []
+                for piece, center in permutation:
+                    pointsAux = 0
+                    if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
+                    if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
+                    pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
+                    list_aux.append(pointsAux)
+                points_list.append(max(list_aux))
+           
+            piece_points.append(min(points_list))
 
-    #     return max(piece_points) #*evaluates only the worst piece (otherwise it would not be optimistic)
+        return max(piece_points) #*evaluates only the worst piece (otherwise it would not be optimistic)
 
 
         
@@ -205,7 +205,7 @@ class Game:
         
 
 
-    def greedy_search(self, easy = False, generate = False):
+    def greedy_search(self, generate = False):
         self.dfs_visited = []
         start_node = copy.deepcopy(self)
         current_node = copy.deepcopy(self)
@@ -225,15 +225,18 @@ class Game:
                 #self.dfs_visited.append(current_node.board.board)
                 current_node.board = current_node.board.parentBoard #BACKTRACK
                 continue
-            
-            if not easy:
-                current_node = min(neighbours, key = lambda x: x.heuristics())    #Expands the node with max points
-            else:
+
+            if self.settings.heuristic == 1:
                 current_node = min(neighbours, key = lambda x: x.simple_heuristics())
+            elif self.settings.heuristic == 2:
+                current_node = min(neighbours, key = lambda x: x.admissible_heuristics())
+            elif self.settings.heuristic == 3:
+                current_node = min(neighbours, key = lambda x: x.heuristics())
+        
         return None
 
 
-    def a_star_search(self, easy = True, limit = False):
+    def a_star_search(self, limit = False):
         self.dfs_visited = []
         current = copy.deepcopy(self)
         frontier = [current]
@@ -244,14 +247,16 @@ class Game:
         while frontier:
             self.stats.update_timer()
 
-            if self.stats.ms > 150 and limit:
+            if (self.stats.ms > 150) and limit:
                 return []
                 
 
-            if not easy: current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
-            else: current = min(frontier, key = lambda x: cost_so_far[x] + x.simple_heuristics())
-
-           
+            if self.settings.heuristic == 1:
+                current = min(frontier, key = lambda x: cost_so_far[x] + x.simple_heuristics())
+            elif self.settings.heuristic == 2:
+                current = min(frontier, key = lambda x: cost_so_far[x] + x.admissible_heuristics())
+            elif self.settings.heuristic == 3:
+                current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
             
             self.nodes_expanded += 1
 
@@ -413,14 +418,14 @@ class Game:
     def get_possible_board(self):
         found = False
         while not found:
-            print("Generating board...")
+            #print("Generating board...")
             self.iddfs_solution = None
             self.generate_random_puzzle()
             self.cleanstack()
             solution = self.greedy_search(generate=True)
             if solution != None and solution != []:
                 self.board = solution[-1]
-                astar = self.a_star_search(True,True)
+                astar = self.a_star_search(limit=True)
                 if astar != [] and len(astar) < 4:
                     continue
                 found = True

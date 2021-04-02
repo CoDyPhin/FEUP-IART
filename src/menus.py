@@ -59,7 +59,7 @@ main_menu.add.selector("Random Puzzle Generation: ", [('Off', 1), ('On', 2)], on
 main_menu.add.selector("Mode: ", [('Player vs Puzzle', 1), ('AI vs Puzzle', 2)], onchange=set_mode)
 memorybtn = main_menu.add.selector("Track memory usage: ", [('Off', 1), ('On', 2)], onchange=set_memtrack)
 searchbtn = main_menu.add.selector("Search Method: ", [('Breadth-First Search', 1), ('Depth-First Search',2), ('Iterative Deepening',3), ('Greedy Search',4), ('A* Algorithm',5)], onchange=set_search)
-heuristicbtn = main_menu.add.selector("Heuristic: ", [('Simple Algorithm', 1), ('Complex Algorithm',2)], onchange=set_heuristic)
+heuristicbtn = main_menu.add.selector("Heuristic: ", [('Simple Algorithm', 1), ('Complex Algorithm',2), ('Fast Algorithm', 3)], onchange=set_heuristic)
 quitbtn = main_menu.add.button("Quit Game", menu.events.EXIT)
 main_menu.remove_widget(memorybtn)
 main_menu.remove_widget(searchbtn)

@@ -4,6 +4,8 @@ from drawings import *
 # Game Loops
 
 def game_loop():
+    if gamesettings.randompz == 2:
+        draw_loading()
     GameState = Game(gamesettings)
     if GameState.settings.mode == 1:
         puzzle_finished = player_loop(GameState)
@@ -56,58 +58,32 @@ def ai_loop(GameState):
         GameState.cleanstack()
 
     elif GameState.settings.search == 4:
-        if GameState.settings.heuristic == 1:
-            if GameState.settings.memtrack == 2:
-                tracemalloc.start()
-            pathlist = GameState.greedy_search(True)
+        if GameState.settings.memtrack == 2:
+            tracemalloc.start()
+        pathlist = GameState.greedy_search()
 
-            if GameState.settings.memtrack == 2:
-                GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
-                tracemalloc.stop()
-                
-            #GameState.stats.moves = len(pathlist)
-            GameState.cleanstack()
-       
-        elif GameState.settings.heuristic == 2:
+        if GameState.settings.memtrack == 2:
+            GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
+            tracemalloc.stop()
             
-            if GameState.settings.memtrack == 2:
-                tracemalloc.start()
-            pathlist = GameState.greedy_search()
-
-            if GameState.settings.memtrack == 2:
-                GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
-                tracemalloc.stop()
-                
-            #GameState.stats.moves = len(pathlist)
-            GameState.cleanstack()
-
+        #GameState.stats.moves = len(pathlist)
+        GameState.cleanstack()
 
     elif GameState.settings.search == 5:
-        if GameState.settings.heuristic == 1:
-            if GameState.settings.memtrack == 2:
-                tracemalloc.start()
+        if GameState.settings.memtrack == 2:
+            tracemalloc.start()
 
-            pathlist = GameState.a_star_search(True)
+        pathlist = GameState.a_star_search()
 
-            if GameState.settings.memtrack == 2:
-                GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
-                tracemalloc.stop()
-            
-            #GameState.stats.moves = len(pathlist)
-            GameState.cleanstack()
-        elif GameState.settings.heuristic == 2:
-            if GameState.settings.memtrack == 2:
-                tracemalloc.start()
-            
-            pathlist = GameState.a_star_search(False, False)
-
-            if GameState.settings.memtrack == 2:
-                GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
-                tracemalloc.stop()
-            
-            GameState.cleanstack()
-
-    if(pathlist[-1].parentBoard == None):
+        if GameState.settings.memtrack == 2:
+            GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
+            tracemalloc.stop()
+        
+        #GameState.stats.moves = len(pathlist)
+        GameState.cleanstack()
+    
+    #print(pathlist)
+    if(pathlist != [] and pathlist != None and pathlist[-1].parentBoard == None):
         pathlist.remove(pathlist[-1])
     
     GameState.stats.moves = len(pathlist)
@@ -115,6 +91,7 @@ def ai_loop(GameState):
         GameState.board = pathlist[0]
         GameState.stats.update_timer()
         draw_replay(pathlist, GameState.stats.timestring)
+    else: print("Solution not found!")
     return GameState.board.check_game_over()
 
 def player_loop(GameState):

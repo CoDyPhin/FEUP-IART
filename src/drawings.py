@@ -25,6 +25,7 @@ RED_INSIDE_IMG = pygame.image.load(os.path.join('assets', 'redinside.png'))
 GREEN_INSIDE_IMG = pygame.image.load(os.path.join('assets', 'greeninside.png'))
 YELLOW_INSIDE_IMG = pygame.image.load(os.path.join('assets', 'yellowinside.png'))
 PURPLE_INSIDE_IMG = pygame.image.load(os.path.join('assets', 'purpleinside.png'))
+LOADING = pygame.image.load(os.path.join('assets', 'loadingscreen.jpg'))
 
 # Sprite organizing
 SPRITES_IMG = {'bP': BLUE_PIECE_IMG, 'rP': RED_PIECE_IMG, 'gP': GREEN_PIECE_IMG, 'yP': YELLOW_PIECE_IMG, 'pP': PURPLE_PIECE_IMG, 
@@ -37,7 +38,29 @@ SPRITES = {'x': BLOCK, 'o': GRASS}
 for (key,value) in SPRITES_IMG.items():
     SPRITES[key] = pygame.transform.scale(value, (110, 110))
 
+LOADING_SCREEN = pygame.transform.scale(LOADING, (WIDTH, HEIGHT))
+
 # Drawings
+
+def draw_loading():
+    SCREEN.blit(LOADING_SCREEN, (0,0))
+    font1 = pygame.font.SysFont('Times New Roman', 40)
+    font2 = pygame.font.SysFont('Times New Roman', 30)
+    text1 = font1.render("Generating a random puzzle...", True, (0,26,51))
+    #text1.set_alpha(127)
+    text2 = font2.render("This might take a while depending on the difficulty", True, (0,89,179))
+    #text2.set_alpha(127)
+    text3 = font2.render("Selected Difficulty: " + gamesettings.puzzledbstr, True, (0,89,179))
+    text1_rect = text1.get_rect()
+    text2_rect = text2.get_rect()
+    text3_rect = text3.get_rect()
+    text1_rect.center = (WIDTH//2, 80)
+    text2_rect.center = (WIDTH//2, 180)
+    text3_rect.center = (WIDTH//2, 240)
+    SCREEN.blit(text1, text1_rect)
+    SCREEN.blit(text2, text2_rect)
+    SCREEN.blit(text3, text3_rect)
+    pygame.display.update()
 
 def draw_board(board):
     multfactor = 7-len(board)
