@@ -30,8 +30,8 @@ class Game:
             self.board.parentBoard = None
         else:
             if self.settings.puzzledb == 1:
-                self.board = staticBoard
-                #self.board = copy.deepcopy(easy_db[random.randint(0,len(easy_db)-1)])
+                
+                self.board = copy.deepcopy(easy_db[random.randint(0,len(easy_db)-1)])
             elif self.settings.puzzledb == 2:
                 self.board = copy.deepcopy(medium_db[random.randint(0,len(medium_db)-1)])
             elif self.settings.puzzledb == 3:
@@ -158,46 +158,45 @@ class Game:
 
 
 
+    # def admissible_heuristics(self):
+    #     gameStateBoard = self.board
+    #     piece_points = []
+    #     for pieces in self.grouped_pieces:
+    #         points_list = []
+    #         permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
+    #         for permutation in permutations:
+    #             list_aux = []
+    #             for piece, center in permutation:
+    #                 pointsAux = 0
+    # #                 if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
+    # #                 if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
+    #                 pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
+    #                 list_aux.append(pointsAux)
+    #             points_list.append(max(list_aux))
+            
+    #         piece_points.append(min(points_list))
+
+    #     return max(piece_points) #*evaluates only the worst piece (otherwise it would not be optimistic)
+
+
+        
     def heuristics(self):
         points = 0
         gameStateBoard = self.board
         piece_points = []
         for pieces in self.grouped_pieces:
-            points_list = []
-            permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
-            for permutation in permutations:
-                list_aux = []
-                for piece, center in permutation:
-                    pointsAux = 0
-                    if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
-                    if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
-                    pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
-                    list_aux.append(pointsAux)
-                points_list.append(max(list_aux))
-            
-            piece_points.append(min(points_list))
-            points += min(points_list)
-
-        return max(piece_points) #*evaluates only the worst piece (otherwise it would not be optimistic)
-
-
-        
-    def heuristics_not_admissible(self):
-        points = 0
-        gameStateBoard = self.board
-        piece_points = []
-        for pieces in self.grouped_pieces:
+            # print(len(pieces))
             points_list = []
             permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
             for permutation in permutations:
                 pointsAux = 0
                 for piece, center in permutation:
-                    if center[0] == piece.x: pointsAux += check_obstaclesX(piece, center[0], gameStateBoard.board)
-                    if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
+                    # if center[0] == piece.x: pointsAux += 1check_obstaclesX(piece, center[0], gameStateBoard.board)
+                    # if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
                     pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
                 points_list.append(pointsAux)
             
-            piece_points.append(min(points_list))
+            # piece_points.append(min(points_list))
             points += min(points_list)
 
         return points #*evaluates only the worst piece (otherwise it would not be optimistic)
