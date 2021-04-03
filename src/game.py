@@ -24,7 +24,6 @@ class Game:
         self.permutations = self.get_permutations()
         
     def select_board(self):
-
         if self.settings.randompz == 2:
             self.get_possible_board()
             self.board.parentBoard = None
@@ -103,7 +102,6 @@ class Game:
                 result = getPath(self.iddfs_solution.board, [])
                 return result
             depth += 2
-            #print(depth)
 
 
     def iddfs(self, gameState, depth):
@@ -131,8 +129,6 @@ class Game:
         for piece in gameStateBoard.pieces:
             listCenters = zip(piece.destX, piece.destY)
             for center in listCenters:
-                # if center[0] != piece.x: points += 1
-                # if center[1] != piece.y: points += 1
                 if center[0] != piece.x and center[1] != piece.y:
                     points += 1
         
@@ -182,7 +178,6 @@ class Game:
     def heuristics(self):
         points = 0
         gameStateBoard = self.board
-        piece_points = []
         for pieces in self.grouped_pieces:
             points_list = []
             permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
@@ -278,7 +273,6 @@ class Game:
         frontier = [current]
         cost_so_far = {current: 0}
         self.nodes_expanded = 0
-        #self.stats.start_timer()
 
         while frontier:
             current = min(frontier, key = lambda x: cost_so_far[x] + x.heuristics())
@@ -419,6 +413,7 @@ class Game:
                 self.cleanstack()
         return solution
 
+#*  Estimates distance between piece and center
 def estimateCenterDifference(piece, center, board):
     pointsX = 0
     pointsY = 0

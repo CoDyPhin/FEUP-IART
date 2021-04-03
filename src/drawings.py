@@ -155,7 +155,6 @@ def draw_stats_screen(gamestate):
         if gamestate.settings.search in [4,5]:
             heuristic = font.render("Heuristic: " + gamestate.settings.heuristicstr, True, (0,0,255), BACKGRD_COLOR)
             itlist += [heuristic]
-        #itlist += [puzzledb]
     elif gamestate.settings.mode == 1:
         itfactor = 100
         itlist += [stgstitle, puzzledb, puzzlernd]
@@ -174,7 +173,6 @@ def draw_stats_screen(gamestate):
     pygame.display.update()
 
 def draw_replay(pathlist, timestr):
-    #draw_replay_stats(timestr, 0)
     for i in range(len(pathlist)):
         pygame.event.pump()
         SCREEN.fill(BACKGRD_COLOR)

@@ -1,5 +1,5 @@
 from board import *
-easy_db = (
+easy_db = ( #*Few milisseconds
     Board([
         [['o','gP'],        ['o','-'],     ['gC','-'],     ['o','gP']],
         [['o','-'],        ['o','-'],      ['gC','-'],    ['o','-']],
@@ -69,7 +69,7 @@ easy_db = (
     
 )
 
-medium_db = (
+medium_db = (       #* 5 - 40 secs
     Board([
         [['o','-'],        ['x','x'],     ['o','-'],     ['yC','-']],
         [['o','-'],        ['x','x'],      ['o','-'],    ['x','x']],
@@ -205,7 +205,7 @@ medium_db = (
     ])
 )
 
-hard_db = (
+hard_db = (     #* 30 - 200 secs 
     Board([
         [['o','-'],        ['o','-'],     ['x','x'],     ['o','-'],   ['x','x']],
         [['o','pP'],        ['o','-'],      ['o','-'],    ['o','pP'],     ['o','-']],
