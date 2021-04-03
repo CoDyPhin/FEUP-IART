@@ -42,7 +42,6 @@ def ai_loop(GameState):
             GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
             tracemalloc.stop()
         pathlist = GameState.dfs_result
-        #GameState.stats.moves = len(pathlist) - 1
         GameState.cleanstack()
 
     elif GameState.settings.search == 3:
@@ -52,7 +51,6 @@ def ai_loop(GameState):
         if GameState.settings.memtrack == 2:
             GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
             tracemalloc.stop()
-        #GameState.stats.moves = len(pathlist) - 1
         GameState.cleanstack()
 
     elif GameState.settings.search == 4:
@@ -64,7 +62,6 @@ def ai_loop(GameState):
             GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
             tracemalloc.stop()
             
-        #GameState.stats.moves = len(pathlist)
         GameState.cleanstack()
 
     elif GameState.settings.search == 5:
@@ -77,7 +74,6 @@ def ai_loop(GameState):
             GameState.stats.memoryused = tracemalloc.get_traced_memory()[1]
             tracemalloc.stop()
         
-        #GameState.stats.moves = len(pathlist)
         GameState.cleanstack()
     
     #print(pathlist)

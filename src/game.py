@@ -5,8 +5,6 @@ import copy
 import itertools
 import random
 
-#from drawings import *
-
 global gamesettings
 gamesettings = Settings(1,1,1,1,1,1)
 
@@ -54,7 +52,7 @@ class Game:
         neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
         return neighbours
 
-# Search Methods
+#* Search Methods
 
     def dfs(self, gameState):
         gameStateBoard = gameState.board
@@ -72,8 +70,8 @@ class Game:
     
     def bfs(self, gameState):
         rootBoard = gameState.board
-        visited = []    #   List to keep track of visited nodes.
-        queue = []      #   Initialize a queue
+        visited = []    #*  List to keep track of visited nodes.
+        queue = []      #*   Initialize a queue
         visited.append(rootBoard)
         queue.append(rootBoard)
         while queue:
@@ -95,7 +93,7 @@ class Game:
     def iterative_deepening(self, gameState):
         depth = 1
         self.iddfs_result = None
-        while True:     #BEWARE OF IMPOSSIBLE PUZZLES
+        while True:     #*BEWARE OF IMPOSSIBLE PUZZLES
             self.dfs_visited = []
             self.iddfs(gameState, depth)
             if self.iddfs_solution != None:
@@ -138,7 +136,7 @@ class Game:
     
 
 
-    def group_pieces(self): #GROUP PIECES BY COLOR
+    def group_pieces(self): #*GROUP PIECES BY COLOR
         piecesDict = {}
         for piece in self.board.pieces:
             if piece.color not in piecesDict.keys():
@@ -298,7 +296,7 @@ class Game:
         print("Impossible puzzle!")
         return []
 
-    #   GENERATE RANDOM PUZZLES
+    #   *GENERATE RANDOM PUZZLES
     
     def generate_random_board(self):
         empty_board = [[['o','-'],        ['o','-'],     ['o','-'],     ['o','-'],      ['o','-']],
