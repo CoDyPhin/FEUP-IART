@@ -179,8 +179,6 @@ def draw_replay(pathlist, timestr):
         pygame.event.pump()
         SCREEN.fill(BACKGRD_COLOR)
         draw_board(pathlist[-(i+1)].board)
-        #for j in range(len(pathlist[-(i+1)].pieces)):
-        #    print("Piece " + str(j) + ": " + str((pathlist[-(i+1)].pieces[j].x, pathlist[-(i+1)].pieces[j].y)))
         draw_replay_stats(timestr, i+1)
         pygame.display.update()
         pygame.time.wait(500)

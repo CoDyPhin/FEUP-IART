@@ -24,13 +24,12 @@ class Game:
         self.permutations = self.get_permutations()
         
     def select_board(self):
-        staticBoard = Board([[['o', '-'], ['o', '-'], ['o', '-'], ['o', '-'], ['rC', '-']], [['o', '-'], ['o', '-'], ['o', '-'], ['o', '-'], ['x', 'x']], [['gC', '-'], ['o', '-'], ['o', '-'], ['o', '-'], ['o', '-']], [['o', 'gP'], ['x', 'x'], ['x', 'x'], ['x', 'x'], ['o', 'rP']], [['x', 'x'], ['bC', 'bP'], ['o', '-'], ['o', '-'], ['o', '-']]])
+
         if self.settings.randompz == 2:
             self.get_possible_board()
             self.board.parentBoard = None
         else:
             if self.settings.puzzledb == 1:
-                
                 self.board = copy.deepcopy(easy_db[random.randint(0,len(easy_db)-1)])
             elif self.settings.puzzledb == 2:
                 self.board = copy.deepcopy(medium_db[random.randint(0,len(medium_db)-1)])
@@ -185,18 +184,14 @@ class Game:
         gameStateBoard = self.board
         piece_points = []
         for pieces in self.grouped_pieces:
-            # print(len(pieces))
             points_list = []
             permutations = self.permutations[tuple(pieces)] #  *Finds best combination between pieces and respective centers*
             for permutation in permutations:
                 pointsAux = 0
                 for piece, center in permutation:
-                    # if center[0] == piece.x: pointsAux += 1check_obstaclesX(piece, center[0], gameStateBoard.board)
-                    # if center[1] == piece.y: pointsAux += check_obstaclesY(piece, center[1], gameStateBoard.board)
                     pointsAux += estimateCenterDifference(piece, center, gameStateBoard.board)
                 points_list.append(pointsAux)
             
-            # piece_points.append(min(points_list))
             points += min(points_list)
 
         return points #*evaluates only the worst piece (otherwise it would not be optimistic)
@@ -222,7 +217,6 @@ class Game:
             self.stats.operations+=len(neighbours)
 
             if len(neighbours) == 0:
-                #self.dfs_visited.append(current_node.board.board)
                 current_node.board = current_node.board.parentBoard #BACKTRACK
                 continue
 
@@ -291,17 +285,13 @@ class Game:
             self.nodes_expanded += 1
             if current.board.check_game_over():
                 solution = getPath(current.board, [])
-                #print(solution)
                 solution.reverse()
-                #print(solution)
                 return solution
 
             neighbours = [copy.deepcopy(current) for i in range(4)]
             neighbour_boards = [neighbours[0].board.setParentBoard(current.board).setMove("up").move_up(), neighbours[1].board.setParentBoard(current.board).setMove("down").move_down(), neighbours[2].board.setParentBoard(current.board).setMove("left").move_left(), neighbours[3].board.setParentBoard(current.board).setMove("right").move_right()]
             neighbours = [neighbours[i] for i in range(len(neighbour_boards)) if neighbour_boards[i] == True]
             neighbours = [x for x in neighbours if x not in self.dfs_visited]
-            #self.stats.operations += len(neighbours)
-            #print([i.board.move for i in neighbours])
             for next in neighbours:
                 self.dfs_visited.append(next)
                 new_cost = cost_so_far[current] + 1
@@ -339,7 +329,6 @@ class Game:
             n_obstacles = random.randint(6, 15)
         elif factor == 3:
             n_obstacles = random.randint(9, 18)
-        #n_obstacles = random.randint((3+factor)*(3+factor)-(4-factor)*5, (3+factor)*(3+factor)-(4-factor)*8)
 
         possible_positions = []
 
@@ -382,7 +371,6 @@ class Game:
                 return None
 
             self.board = neighbours[random.randrange(len(neighbours))].board
-            #print(self.board.board)
             visited.append(self.board.board)
         self.board.centers = []
         self.board.pieces = []
@@ -418,7 +406,6 @@ class Game:
     def get_possible_board(self):
         found = False
         while not found:
-            #print("Generating board...")
             self.iddfs_solution = None
             self.generate_random_puzzle()
             self.cleanstack()
@@ -464,7 +451,6 @@ def estimateCenterDifference(piece, center, board):
         else: 
             pointsY += 1
       
-    # print((piece.x,piece.y), (center[0],center[1]),pointsX+pointsY)
     return pointsX + pointsY
 
     
@@ -472,14 +458,14 @@ def check_obstaclesX(piece, centerX, board):
     iterMin = min(piece.x, centerX)
     iterMax = max(piece.y, centerX)
     for i in range(iterMin, iterMax):
-        if board[piece.y][i][0] == "x":  return 3
+        if board[piece.y][i][0] == "x":  return 3   #*Applies penalization if there is an obstacle in the way
     return 0
 
 def check_obstaclesY(piece, centerY, board):
     iterMin = min(piece.y, centerY)
     iterMax = max(piece.y, centerY)
     for i in range(iterMin, iterMax):
-        if board[i][piece.x][0] == "x": return 3
+        if board[i][piece.x][0] == "x": return 3    #*Applies penalization if there is an obstacle in the way
     return 0
 
 def getPath(board, listBoards):
