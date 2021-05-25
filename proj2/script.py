@@ -280,4 +280,51 @@ print(classification_report(training_classes, predictions_train, target_names=['
 print(classification_report(testing_classes, predictions_test, target_names=['IGNORE', 'BUY']))
 
 
+score_df = pd.DataFrame()
+best_scores = {}
+best_scores['Decision Trees'] = dtgs.best_score_
+best_scores['Neural Networks'] = mlpgs.best_score_
+best_scores['Support Vector Machine'] = svmgs.best_score_
+best_scores['K Nearest Neighbours'] = knngs.best_score_
+for name, score in best_scores.items():
+    score_df = score_df.append(pd.DataFrame({'Score': [score], 'Classifier': [name]}))
 
+ax = sb.barplot(x='Classifier', y='Score', data=score_df)
+ax.set_title('Classifiers Best Accuracy Score')
+ax.set_xticklabels(ax.get_xticklabels(), rotation=20, horizontalalignment='right')
+
+
+classifiers = {}
+classifiers['Decision Trees'] = dtgs.best_estimator_
+classifiers['Neural Networks'] = mlpgs.best_estimator_
+classifiers['Support Vector Machine'] = svmgs.best_estimator_
+classifiers['K Nearest Neighbours'] = knngs.best_estimator_
+clf_df = pd.DataFrame()
+for name, clf in classifiers.items():
+    clf_df = clf_df.append(pd.DataFrame({'precision_weighted': cross_val_score(clf, inputs_train, training_classes, cv=StratifiedKFold(n_splits=10)),
+                       'classifier': [name] * 10}))
+
+ax = sb.boxplot(x='classifier', y='precision_weighted', data=clf_df)
+ax.set_title('Classifiers Accuracy')
+ax.set_xticklabels(ax.get_xticklabels(), rotation=20, horizontalalignment='right')
+
+fittime_df = pd.DataFrame()
+fit_times = {}
+fit_times['Decision Trees'] = np.mean(dtgs.cv_results_['mean_fit_time'])
+fit_times['Neural Networks'] = np.mean(mlpgs.cv_results_['mean_fit_time'])
+fit_times['Support Vector Machine'] = np.mean(svmgs.cv_results_['mean_fit_time'])
+fit_times['K Nearest Neighbours'] = np.mean(knngs.cv_results_['mean_fit_time'])
+for name, fittime in fit_times.items():
+    fittime_df = fittime_df.append(pd.DataFrame({'Avg Fit Time': [fittime], 'Classifier': [name]}))
+    
+ax = sb.barplot(x='Classifier', y='Avg Fit Time', data=fittime_df)
+ax.set_title('Classifiers Average Fit Time')
+ax.set_xticklabels(ax.get_xticklabels(), rotation=20, horizontalalignment='right')
+
+grid_visualization = mlpgs.cv_results_['mean_test_score']
+grid_visualization.shape = (4, 12)
+sb.heatmap(grid_visualization, cmap='Blues', annot=True)
+plt.xticks(np.arange(3) + 0.5, mlpgs.param_grid['max_features'])
+plt.yticks(np.arange(4) + 0.5, mlpgs.param_grid['max_depth'])
+plt.xlabel('max_features')
+plt.ylabel('max_depth')
